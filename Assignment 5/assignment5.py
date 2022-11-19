@@ -179,7 +179,7 @@ def ex13():
     # output columns: prod_name, prod_price
 
     ### BEGIN SOLUTION
-    sql_statement = ""
+    sql_statement = "SELECT prod_name, prod_price FROM products WHERE prod_price BETWEEN 5 AND 10"
     ### END SOLUTION
     # df = pd.read_sql_query(sql_statement, conn_orders)
     # display(df)
@@ -191,7 +191,7 @@ def ex14():
     # output columns: cust_id, cust_name
 
     ### BEGIN SOLUTION
-    sql_statement = ""
+    sql_statement = "SELECT cust_id, cust_name FROM customers WHERE cust_email IS NULL"
     ### END SOLUTION
     # df = pd.read_sql_query(sql_statement, conn_orders)
     # display(df)
@@ -204,7 +204,7 @@ def ex15():
     # output columns: vend_id, prod_id, prod_price, prod_name
 
     ### BEGIN SOLUTION
-    sql_statement = ""
+    sql_statement = "SELECT vend_id, prod_id, prod_price, prod_name FROM products WHERE vend_id = 1003 AND prod_price <= 10"
     ### END SOLUTION
     # df = pd.read_sql_query(sql_statement, conn_orders)
     # display(df)
@@ -216,7 +216,7 @@ def ex16():
     # output columns: vend_id, prod_id, prod_price, prod_name
 
     ### BEGIN SOLUTION
-    sql_statement = ""
+    sql_statement = "SELECT vend_id, prod_id, prod_price, prod_name FROM products WHERE vend_id IN (1002,1003) AND prod_price >= 5"
     ### END SOLUTION
     # df = pd.read_sql_query(sql_statement, conn_orders)
     # display(df)
@@ -228,7 +228,7 @@ def ex17():
     # output columns: vend_id, prod_id, prod_price, prod_name
 
     ### BEGIN SOLUTION
-    sql_statement = ""
+    sql_statement = "SELECT vend_id, prod_id, prod_price, prod_name FROM products WHERE vend_id IN (1002, 1003, 1005)"
     ### END SOLUTION
     # df = pd.read_sql_query(sql_statement, conn_orders)
     # display(df)
@@ -241,7 +241,7 @@ def ex18():
     # output columns: vend_id, prod_id, prod_price, prod_name
 
     ### BEGIN SOLUTION
-    sql_statement = ""
+    sql_statement = "SELECT vend_id, prod_id, prod_price, prod_name FROM products WHERE vend_id NOT IN (1002, 1003)"
     ### END SOLUTION
     # df = pd.read_sql_query(sql_statement, conn_orders)
     # display(df)
@@ -252,7 +252,7 @@ def ex19():
     # output columns: prod_id, prod_price, prod_name
 
     ### BEGIN SOLUTION
-    sql_statement = ""
+    sql_statement = "SELECT prod_id, prod_price, prod_name FROM products WHERE prod_name LIKE 'jet%' "
     ### END SOLUTION
     # df = pd.read_sql_query(sql_statement, conn_orders)
     # display(df)
@@ -263,7 +263,7 @@ def ex20():
     # output columns: prod_id, prod_price, prod_name
 
     ### BEGIN SOLUTION
-    sql_statement = ""
+    sql_statement = "SELECT prod_id, prod_price, prod_name FROM products WHERE prod_name LIKE '%anvil'"
     ### END SOLUTION
     # df = pd.read_sql_query(sql_statement, conn_orders)
     # display(df)
