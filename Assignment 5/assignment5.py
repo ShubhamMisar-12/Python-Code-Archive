@@ -47,7 +47,7 @@ def ex2():
     # output columns: vend_id
 
     ### BEGIN SOLUTION
-    sql_statement = ""
+    sql_statement = "SELECT vend_id FROM products"
     ### END SOLUTION
     # df = pd.read_sql_query(sql_statement, conn_orders)
     # display(df)
@@ -59,7 +59,7 @@ def ex3():
     # output columns: vend_id
 
     ### BEGIN SOLUTION
-    sql_statement = ""
+    sql_statement = "SELECT DISTINCT vend_id FROM products"
     ### END SOLUTION
     # df = pd.read_sql_query(sql_statement, conn_orders)
     # display(df)
@@ -71,7 +71,7 @@ def ex4():
     # output columns: prod_name
 
     ### BEGIN SOLUTION
-    sql_statement = ""
+    sql_statement = "SELECT prod_name FROM products LIMIT 5"
     ### END SOLUTION
     # df = pd.read_sql_query(sql_statement, conn_orders)
     # display(df)
@@ -83,7 +83,7 @@ def ex5():
     # output columns: prod_name
 
     ### BEGIN SOLUTION
-    sql_statement = ""
+    sql_statement = "SELECT prod_name FROM products LIMIT 4 OFFSET 3"
     ### END SOLUTION
     # df = pd.read_sql_query(sql_statement, conn_orders)
     # display(df)
@@ -95,7 +95,7 @@ def ex6():
     # output columns: prod_name
 
     ### BEGIN SOLUTION
-    sql_statement = ""
+    sql_statement = "SELECT prod_name FROM products ORDER BY prod_name"
     ### END SOLUTION
     # df = pd.read_sql_query(sql_statement, conn_orders)
     # display(df)
@@ -107,7 +107,7 @@ def ex7():
     # output columns: prod_id, prod_price, prod_name
 
     ### BEGIN SOLUTION
-    sql_statement = ""
+    sql_statement = "SELECT prod_id, prod_price, prod_name FROM products ORDER BY prod_price, prod_name"
     ### END SOLUTION
     # df = pd.read_sql_query(sql_statement, conn_orders)
     # display(df)
@@ -120,7 +120,7 @@ def ex8():
     # output columns: prod_id, prod_price, prod_name
 
     ### BEGIN SOLUTION
-    sql_statement = ""
+    sql_statement = "SELECT prod_id, prod_price, prod_name FROM products ORDER by prod_price DESC, prod_name"
     ### END SOLUTION
     # df = pd.read_sql_query(sql_statement, conn_orders)
     # display(df)
@@ -132,7 +132,7 @@ def ex9():
     # output columns: prod_id, prod_price, prod_name
 
     ### BEGIN SOLUTION
-    sql_statement = ""
+    sql_statement = "SELECT prod_id, prod_price, prod_name FROM products WHERE prod_price = 2.50"
     ### END SOLUTION
     # df = pd.read_sql_query(sql_statement, conn_orders)
     # display(df)
@@ -143,7 +143,7 @@ def ex10():
     # output columns: prod_id, prod_price, prod_name
 
     ### BEGIN SOLUTION
-    sql_statement = ""
+    sql_statement = "SELECT prod_id, prod_price, prod_name FROM products WHERE prod_name = 'Oil can' "
     ### END SOLUTION
     # df = pd.read_sql_query(sql_statement, conn_orders)
     # display(df)
@@ -156,7 +156,7 @@ def ex11():
     # output columns: prod_id, prod_price, prod_name
 
     ### BEGIN SOLUTION
-    sql_statement = "" 
+    sql_statement = "SELECT prod_id, prod_price, prod_name FROM products WHERE prod_price <= 10" 
     ### END SOLUTION
     # df = pd.read_sql_query(sql_statement, conn_orders)
     # display(df)
@@ -168,7 +168,7 @@ def ex12():
     # output columns: vend_id, prod_name
 
     ### BEGIN SOLUTION
-    sql_statement = ""
+    sql_statement = "SELECT vend_id, prod_name FROM products WHERE vend_id != 1003"
     ### END SOLUTION
     # df = pd.read_sql_query(sql_statement, conn_orders)
     # display(df)
