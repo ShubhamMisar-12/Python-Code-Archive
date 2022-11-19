@@ -35,7 +35,7 @@ def ex1():
     # output columns: cust_name, cust_email
 
     ### BEGIN SOLUTION
-    sql_statement = ""
+    sql_statement = "SELECT cust_name, cust_email FROM customers"
     ### END SOLUTION
     # df = pd.read_sql_query(sql_statement, conn_orders)
     # display(df)
