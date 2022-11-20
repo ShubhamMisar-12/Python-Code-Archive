@@ -17,13 +17,13 @@ cur = conn_orders.cursor()
 # df = pd.read_sql_query(sql_statement, conn_orders)
 # display(df)
 
-# sql_statement = "select * from products;"
-# df = pd.read_sql_query(sql_statement, conn_orders)
-# display(df)
+sql_statement = "select * from products;"
+df = pd.read_sql_query(sql_statement, conn_orders)
+print(df.columns)
 
-# sql_statement = "select * from orderitems;"
-# df = pd.read_sql_query(sql_statement, conn_orders)
-# display(df)
+#sql_statement = "select * from orderitems;"
+#df = pd.read_sql_query(sql_statement, conn_orders)
+#print(df)
 
 # sql_statement = "select * from productnotes;"
 # df = pd.read_sql_query(sql_statement, conn_orders)
@@ -275,7 +275,7 @@ def ex21():
     # output columns: vend_title
 
     ### BEGIN SOLUTION
-    sql_statement = ""
+    sql_statement = "SELECT vend_name|| ' ' || '(' || vend_country || ')' AS vend_title FROM vendors ORDER BY vend_title"
     ### END SOLUTION
     # df = pd.read_sql_query(sql_statement, conn_orders)
     # display(df)
@@ -289,7 +289,7 @@ def ex22():
     # output columns: prod_id, quantity, item_price, expanded_price
 
     ### BEGIN SOLUTION
-    sql_statement = ""
+    sql_statement = "SELECT prod_id, quantity, item_price, ROUND(quantity * item_price,2) AS expanded_price FROM orderitems WHERE order_num = 20005"
     ### END SOLUTION
     # df = pd.read_sql_query(sql_statement, conn_orders)
     # display(df)
@@ -302,7 +302,7 @@ def ex23():
     # https://www.sqlitetutorial.net/sqlite-date-functions/sqlite-date-function/
     
     ### BEGIN SOLUTION
-    sql_statement = ""
+    sql_statement = "SELECT order_num, order_date FROM orders WHERE order_date BETWEEN DATE('2005-09-13') AND DATE('2005-10-04')"
     ### END SOLUTION
     # df = pd.read_sql_query(sql_statement, conn_orders)
     # display(df)
@@ -314,7 +314,7 @@ def ex24():
     # output columns: avg_price
 
     ### BEGIN SOLUTION
-    sql_statement = ""
+    sql_statement = "SELECT AVG(prod_price) AS avg_price FROM products"
     ### END SOLUTION
     # df = pd.read_sql_query(sql_statement, conn_orders)
     # display(df)
@@ -327,7 +327,7 @@ def ex25():
     # output columns: avg_price
 
     ### BEGIN SOLUTION
-    sql_statement = ""
+    sql_statement = "SELECT AVG(prod_price) AS avg_price FROM products WHERE vend_id =1003"
     ### END SOLUTION
     # df = pd.read_sql_query(sql_statement, conn_orders)
     # display(df)
@@ -341,7 +341,7 @@ def ex26():
     # output columns: num_cust
 
     ### BEGIN SOLUTION
-    sql_statement = ""
+    sql_statement = "SELECT COUNT(*) AS num_cust FROM customers"
     ### END SOLUTION
     # df = pd.read_sql_query(sql_statement, conn_orders)
     # display(df)
@@ -353,7 +353,7 @@ def ex27():
     # output columns: max_price
 
     ### BEGIN SOLUTION
-    sql_statement = ""
+    sql_statement = "SELECT ROUND(MAX(prod_price),2) AS max_price FROM products"
     ### END SOLUTION
     # df = pd.read_sql_query(sql_statement, conn_orders)
     # display(df)
@@ -365,7 +365,7 @@ def ex28():
     # output columns: min_price
 
     ### BEGIN SOLUTION
-    sql_statement = ""
+    sql_statement = "SELECT ROUND(MIN(prod_price), 2) AS min_price FROM products"
     ### END SOLUTION
     # df = pd.read_sql_query(sql_statement, conn_orders)
     # display(df)
@@ -377,7 +377,7 @@ def ex29():
     # output columns: items_ordered
 
     ### BEGIN SOLUTION
-    sql_statement = ""
+    sql_statement = "SELECT SUM(quantity) AS items_ordered FROM orderitems WHERE order_num = 20005"
     ### END SOLUTION
     # df = pd.read_sql_query(sql_statement, conn_orders)
     # display(df)
@@ -456,7 +456,29 @@ def normalize_database(non_normalized_db_filename):
 
     
     ### BEGIN SOLUTION
-    pass
+    """
+    CREATE TABLE Degree (
+	Degree INTEGER PRIMARY KEY,
+    );
+
+    CREATE TABLE Exams (
+	Exam TEXT PRIMARY KEY,
+	Year TEXT NOT NULL,
+    );
+
+    CREATE TABLE contacts (
+	StudentID INTEGER PRIMARY KEY,
+	First_Name TEXT NOT NULL,
+	Last_Name TEXT NOT NULL,
+	Degree TEXT NOT NULL UNIQUE
+    );
+
+    CREATE TABLE StudentExamScore (
+	PK INTEGER PRIMARY KEY,
+	StudentID TEXT NOT NULL,
+	Exam TEXT NOT NULL,
+	Score TEXT NOT NULL UNIQUE,
+    );"""
     ### END SOLUTION
         
     
