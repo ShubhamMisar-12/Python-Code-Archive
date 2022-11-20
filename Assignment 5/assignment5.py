@@ -5,6 +5,10 @@ from sqlite3 import Error
 conn_orders = sqlite3.connect("orders.db")
 cur = conn_orders.cursor()
 
+
+# df = pd.read_sql_query(sql_statement, conn_orders)
+# display(df)
+
 # sql_statement = "select * from customers;"
 # df = pd.read_sql_query(sql_statement, conn_orders)
 # display(df)
@@ -17,9 +21,9 @@ cur = conn_orders.cursor()
 # df = pd.read_sql_query(sql_statement, conn_orders)
 # display(df)
 
-sql_statement = "select * from products;"
-df = pd.read_sql_query(sql_statement, conn_orders)
-print(df.columns)
+# sql_statement = "select * from products;"
+# df = pd.read_sql_query(sql_statement, conn_orders)
+# print(df.columns)
 
 #sql_statement = "select * from orderitems;"
 #df = pd.read_sql_query(sql_statement, conn_orders)
@@ -423,6 +427,45 @@ def execute_sql_statement(sql_statement, conn):
 
     return rows
 
+def insert_Exams(conn, values):
+    try:    
+        sql = ''' INSERT INTO Exams(Exam, Year)
+                VALUES(?,?) '''
+        cur = conn.cursor()
+        cur.execute(sql, values)
+        return cur.lastrowid
+    except:
+        return None
+
+def insert_degrees(conn, values):
+    try:
+        sql = ''' INSERT INTO Degrees(Degree)
+                VALUES(?) '''
+        cur = conn.cursor()
+        cur.execute(sql, values)
+        return cur.lastrowid
+    except:
+        return None
+
+def insert_StudentExamScores(conn, values):
+    try:    
+        sql = ''' INSERT INTO StudentExamScores(PK, StudentID, Exam, Score)
+                VALUES(?, ?, ?, ?) '''
+        cur = conn.cursor()
+        cur.execute(sql, values)
+        return cur.lastrowid
+    except:
+        return None
+
+def insert_Students(conn, values):
+    try:    
+        sql = ''' INSERT INTO Students(StudentID, First_Name, Last_Name, Degree)
+                VALUES(?, ?, ?, ?) '''
+        cur = conn.cursor()
+        cur.execute(sql, values)
+        return cur.lastrowid
+    except:
+        return None
 # conn_non_normalized = create_connection('non_normalized.db')
 # sql_statement = "select * from Students;"
 # df = pd.read_sql_query(sql_statement, conn_non_normalized)
@@ -456,32 +499,117 @@ def normalize_database(non_normalized_db_filename):
 
     
     ### BEGIN SOLUTION
+
+
+    conn_non_normalized = create_connection('non_normalized.db')
+
+    sql_statement = "SELECT DISTINCT Degree FROM students"
+    degrees = execute_sql_statement(sql_statement, conn_non_normalized)
+    degrees = list(map(lambda row: row[0], degrees))
+
+    sql_statement = "SELECT Exams, scores FROM students"
+    exams_scores = execute_sql_statement(sql_statement, conn_non_normalized)
+    exam_year = {}
+    score_by_exam = []
+    for ex in exams_scores:
+        dic1 = dict(map(lambda x: (x.strip().split(" ")[0], int(x.strip().split(" ")[1][1:-1])), ex[0].split(",")))
+        lst2 = list(map(lambda x: int(x.strip().split(" ")[0]), ex[1].split(",")))
+        lst_exams = list(map(lambda x: x.strip().split(" ")[0], ex[0].split(",")))
+        score_exam = list(zip(lst_exams,lst2))
+        score_by_exam.append(score_exam)
+        for key in dic1.keys():
+            if key not in exam_year:
+                exam_year[key] = dic1[key]
+    
+    
+    ## Exams Table
+
+    conn_norm = create_connection('normalized.db')
+ 
+    create_table_sql = """CREATE TABLE IF NOT EXISTS [Exams] (
+        [Exam] TEXT NOT NULL PRIMARY KEY,
+        [Year] INTEGER NOT NULL
+    );
     """
-    CREATE TABLE Degree (
-	Degree INTEGER PRIMARY KEY,
-    );
+   
+    create_table(conn_norm, create_table_sql)
 
-    CREATE TABLE Exams (
-	Exam TEXT PRIMARY KEY,
-	Year TEXT NOT NULL,
-    );
 
-    CREATE TABLE contacts (
-	StudentID INTEGER PRIMARY KEY,
-	First_Name TEXT NOT NULL,
-	Last_Name TEXT NOT NULL,
-	Degree TEXT NOT NULL UNIQUE
-    );
+    ## Insert into Exams Table
 
-    CREATE TABLE StudentExamScore (
-	PK INTEGER PRIMARY KEY,
-	StudentID TEXT NOT NULL,
-	Exam TEXT NOT NULL,
-	Score TEXT NOT NULL UNIQUE,
-    );"""
+    with conn_norm:
+        for exam, year in exam_year.items():
+            insert_Exams(conn_norm, (exam, year))
+
+
+    ## Degree Table
+
+    create_table_sql = """CREATE TABLE IF NOT EXISTS [Degrees] (
+    [Degree] TEXT NOT NULL PRIMARY KEY
+    );
+    """
+
+    create_table(conn_norm, create_table_sql)
+
+
+    ## Inserting into Degreee
+    with conn_norm:
+        for d in degrees:
+            insert_degrees(conn_norm, (d, ))
+            
+
+    
+    ## Students
+
+    create_table_sql = """CREATE TABLE IF NOT EXISTS [Students] (
+    [StudentID] INTEGER NOT NULL PRIMARY KEY,
+    [First_Name] INTEGER NOT NULL, 
+    [Last_Name] TEXT NOT NULL,
+    [Degree] TEXT NOT NULL,
+    FOREIGN KEY(Degree) REFERENCES Degrees(Degree)
+    );
+    """
+    conn_norm = create_connection('normalized.db')
+    create_table(conn_norm, create_table_sql)
+
+
+    ## Inserting into students
+
+    with conn_norm:
+        sql_statement = "SELECT studentID,name, Degree FROM Students"
+        ID_name_degree = execute_sql_statement(sql_statement, conn_non_normalized)
+        names = list(map(lambda x: x[1].split(","), ID_name_degree))
+        for i in range(len(names)):
+            insert_Students(conn_norm, (ID_name_degree[i][0],names[i][0].strip(),names[i][1].strip(),ID_name_degree[i][2]))
+
+    ## StudentExamScores
+
+    create_table_sql = """CREATE TABLE IF NOT EXISTS [StudentExamScores] (
+    [PK] INTEGER NOT NULL PRIMARY KEY,
+    [StudentID] INTEGER NOT NULL, 
+    [Exam] TEXT NOT NULL,
+    [Score] INTEGER NOT NULL,
+    FOREIGN KEY(Exam) REFERENCES Exams(Exam)
+    );
+    """
+    
+    create_table(conn_norm, create_table_sql)
+
+
+    ## Inserting StudentExamScores insert_StudentExamScores(conn_norm,(count,i+1,exam,score))
+    with conn_norm:
+        count = 1
+        for i in range(len(score_by_exam)):
+            for se in score_by_exam[i]:
+                insert_StudentExamScores(conn_norm,(count,i+1,se[0],se[1]))
+                count = count + 1
+
+    conn_non_normalized.close()
+
+    
     ### END SOLUTION
         
-    
+
 # normalize_database('non_normalized.db')
 # conn_normalized = create_connection('normalized.db')
 
@@ -490,7 +618,7 @@ def ex30(conn):
     # output columns: exam, year
     
     ### BEGIN SOLUTION
-    sql_statement = ""
+    sql_statement = "SELECT Exam, Year FROM Exams ORDER BY Year, Exam"
     ### END SOLUTION
     # df = pd.read_sql_query(sql_statement, conn)
     # display(df)
@@ -502,7 +630,7 @@ def ex31(conn):
     # output columns: degree
     
     ### BEGIN SOLUTION
-    sql_statement = ""
+    sql_statement = "SELECT Degree FROM Degrees ORDER BY Degree"
     ### END SOLUTION
     # df = pd.read_sql_query(sql_statement, conn)
     # display(df)
@@ -514,7 +642,7 @@ def ex32(conn):
     # output columns: degree, count_degree
     
     ### BEGIN SOLUTION
-    sql_statement = ""
+    sql_statement = "SELECT Degree, count(*) as count_degree FROM Students GROUP BY Degree"
     ### END SOLUTION
     # df = pd.read_sql_query(sql_statement, conn)
     # display(df)
@@ -528,7 +656,7 @@ def ex33(conn):
     
     
     ### BEGIN SOLUTION
-    sql_statement = ""
+    sql_statement = "SELECT StudentExamScores.Exam, Exams.Year, ROUND(AVG(StudentExamScores.score),2) as average FROM StudentExamScores JOIN Exams  ON StudentExamScores.Exam = Exams.Exam GROUP BY StudentExamScores.Exam ORDER BY average DESC"
     ### END SOLUTION
     # df = pd.read_sql_query(sql_statement, conn)
     # display(df)
@@ -541,7 +669,7 @@ def ex34(conn):
     # round to two decimal places
     
     ### BEGIN SOLUTION
-    sql_statement = ""
+    sql_statement = "SELECT Students.Degree, ROUND(AVG(StudentExamScores.score),2) as average FROM StudentExamScores JOIN Students  ON StudentExamScores.StudentID = Students.StudentID GROUP BY Students.Degree"
     ### END SOLUTION
     # df = pd.read_sql_query(sql_statement, conn)
     # display(df)
@@ -555,7 +683,7 @@ def ex35(conn):
     # Warning two of the students have the same average!!!
     
     ### BEGIN SOLUTION
-    sql_statement = ""
+    sql_statement = "SELECT Students.Last_Name as First_Name, Students.First_Name as Last_Name, Students.Degree, ROUND(AVG(StudentExamScores.score),2) as average FROM StudentExamScores JOIN Students  ON StudentExamScores.StudentID = Students.StudentID GROUP BY StudentExamScores.StudentID ORDER BY average DESC LIMIT 10"
     ### END SOLUTION 
     # df = pd.read_sql_query(sql_statement, conn)
     # display(df)

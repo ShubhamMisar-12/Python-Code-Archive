@@ -163,41 +163,36 @@
         },
         {
             "name": "test_ex30 (test_assignment5.TestAssignment5)",
-            "score": 0.0,
+            "score": 6,
             "max_score": 6,
-            "output": "Test Failed: 'NoneType' object is not iterable\n",
             "visibility": "visible",
             "number": "ex30"
         },
         {
             "name": "test_ex31 (test_assignment5.TestAssignment5)",
-            "score": 0.0,
+            "score": 6,
             "max_score": 6,
-            "output": "Test Failed: 'NoneType' object is not iterable\n",
             "visibility": "visible",
             "number": "ex31"
         },
         {
             "name": "test_ex32 (test_assignment5.TestAssignment5)",
-            "score": 0.0,
+            "score": 6,
             "max_score": 6,
-            "output": "Test Failed: 'NoneType' object is not iterable\n",
             "visibility": "visible",
             "number": "ex32"
         },
         {
             "name": "test_ex33 (test_assignment5.TestAssignment5)",
-            "score": 0.0,
+            "score": 6,
             "max_score": 6,
-            "output": "Test Failed: 'NoneType' object is not iterable\n",
             "visibility": "visible",
             "number": "ex33"
         },
         {
             "name": "test_ex34 (test_assignment5.TestAssignment5)",
-            "score": 0.0,
+            "score": 6,
             "max_score": 6,
-            "output": "Test Failed: 'NoneType' object is not iterable\n",
             "visibility": "visible",
             "number": "ex34"
         },
@@ -205,7 +200,7 @@
             "name": "test_ex35 (test_assignment5.TestAssignment5)",
             "score": 0.0,
             "max_score": 6,
-            "output": "Test Failed: 'NoneType' object is not iterable\n",
+            "output": "Test Failed: False != True\n",
             "visibility": "visible",
             "number": "ex35"
         },
@@ -254,6 +249,6 @@
     ],
     "leaderboard": [],
     "visibility": "visible",
-    "execution_time": "0.07",
-    "score": 87.0
+    "execution_time": "0.16",
+    "score": 117.0
 }
