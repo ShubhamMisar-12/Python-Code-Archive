@@ -80,6 +80,17 @@ def insert_product_category(conn, values):
         return cur.lastrowid
     except Error as e:
         print(e)
+
+def insert_product(conn, values):
+    try:
+        sql = ''' INSERT INTO Product(ProductID, ProductName, ProductUnitPrice, ProductCategoryID)
+                VALUES(?, ?, ?, ?) '''
+        cur = conn.cursor()
+        cur.execute(sql, values)
+        return cur.lastrowid
+    except Error as e:
+        print(e)
+
 def step1_create_region_table(data_filename, normalized_database_filename):
     # Inputs: Name of the data and normalized database filename
     # Output: None
@@ -312,7 +323,11 @@ def step8_create_productcategory_to_productcategoryid_dictionary(normalized_data
     
     
     ### BEGIN SOLUTION
-    pass
+    conn_norm = create_connection(normalized_database_filename)
+    product_category_list = execute_sql_statement("SELECT ProductCategoryID, ProductCategory FROM ProductCategory", conn_norm)
+    product_category_dict = dict(map(lambda x: (x[1], x[0]), sorted(product_category_list)))
+    conn_norm.close()
+    return product_category_dict
 
     ### END SOLUTION
         
@@ -324,7 +339,56 @@ def step9_create_product_table(data_filename, normalized_database_filename):
     
     ### BEGIN SOLUTION
     
-    pass
+    # Create Product Table to store products
+
+    conn_norm = create_connection(normalized_database_filename)
+    sql_statement = """CREATE TABLE Product(
+    [ProductID] integer not null Primary key,
+    [ProductName] Text not null,
+    [ProductUnitPrice] Real not null,
+    [ProductCategoryID] integer not null,
+    FOREIGN KEY(ProductCategoryID) REFERENCES ProductCategory(ProductCategoryID)
+    );"""
+    create_table(conn_norm, sql_statement)
+
+
+    ## Inserting into Product Table
+
+
+    with open(data_filename) as file:
+        file_data = file.read()
+
+    header = None
+    product = []
+    for line in file_data.split("\n"):
+        if header == None:
+            header = line.split("\t")
+            continue
+        ln = line.split("\t")
+        try:
+            ln5 = ln[5].split(";")
+            ln6 = ln[6].split(";")
+            ln8 = ln[8].split(";")
+            
+            
+            for prod, prod_catg, prod_price  in zip(ln5, ln6, ln8):
+                
+                if [prod, prod_catg, prod_price] not in product:
+                    product.append([prod, prod_catg, prod_price])
+        except:
+            continue
+    #print(product)
+    product = sorted(product, key = lambda x: x[0])
+    product_category_dict = step8_create_productcategory_to_productcategoryid_dictionary(normalized_database_filename)
+    with conn_norm:
+        product_id = 0
+        for prod in product:
+            #print(prod)
+            product_id += 1
+            #print((product_id, prod[0], prod[2], product_category_dict[prod[1]]))
+            insert_product(conn_norm, (product_id, prod[0], float(prod[2]), product_category_dict[prod[1]]))
+
+    conn_norm.close()
    
     ### END SOLUTION
 
