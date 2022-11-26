@@ -91,6 +91,17 @@ def insert_product(conn, values):
     except Error as e:
         print(e)
 
+def insert_order_details(conn, values):
+    try:
+        #print(values)
+        sql = ''' INSERT INTO OrderDetail(OrderID, CustomerID, ProductID, OrderDate, QuantityOrdered)
+                VALUES(?, ?, ?, ?, ?) '''
+        cur = conn.cursor()
+        cur.execute(sql, values)
+        return cur.lastrowid
+    except Error as e:
+        print(e)
+
 def step1_create_region_table(data_filename, normalized_database_filename):
     # Inputs: Name of the data and normalized database filename
     # Output: None
@@ -396,7 +407,12 @@ def step9_create_product_table(data_filename, normalized_database_filename):
 def step10_create_product_to_productid_dictionary(normalized_database_filename):
     
     ### BEGIN SOLUTION
-    pass
+    conn_norm = create_connection(normalized_database_filename)
+    product_list = execute_sql_statement("SELECT ProductID, ProductName FROM Product", conn_norm)
+    product_dict = dict(map(lambda x: (x[1], x[0]), sorted(product_list)))
+    conn_norm.close()
+    return product_dict
+
 
     ### END SOLUTION
         
@@ -407,8 +423,54 @@ def step11_create_orderdetail_table(data_filename, normalized_database_filename)
 
     
     ### BEGIN SOLUTION
-    pass
-    ### END SOLUTION
+    conn_norm = create_connection(normalized_database_filename)
+    sql_statement = """CREATE TABLE OrderDetail(
+    [OrderID] integer not null Primary Key,
+    [CustomerID] integer not null, 
+    [ProductID] integer not null, 
+    [OrderDate] integer not null, 
+    [QuantityOrdered] integer not null,
+    FOREIGN KEY(CustomerID) REFERENCES Customer(CustomerID)
+    FOREIGN KEY(ProductID) REFERENCES Product(ProductID)
+    );"""
+
+    create_table(conn_norm, sql_statement)
+
+    import datetime
+    ## Inserting into Customer ta
+    with open('data.csv') as file:
+        file_data = file.read()
+        header = None
+        order = []
+        for line in file_data.split("\n"):
+            if header == None:
+                header = line.split("\t")
+                continue
+            ln = line.split("\t")
+            #print(header)
+            try:
+                ln4 = ln[5].split(";")
+                ln9 = ln[9].split(";")
+                ln10 = ln[10].split(";")
+                #print(header)
+                for prod, order_qnty, order_date in zip(ln4, ln9, ln10):
+                    #print(prod)
+                    order.append([ln[0], prod, order_qnty, order_date])
+            except:
+                continue
+
+        customer_dict = step6_create_customer_to_customerid_dictionary(normalized_database_filename)
+        product_dict = step10_create_product_to_productid_dictionary(normalized_database_filename)
+        #print(product)
+        with conn_norm:
+            order_id = 0
+            for ord in order:
+                order_id += 1
+                order_date = datetime.datetime.strptime(ord[3], '%Y%m%d').strftime('%Y-%m-%d')
+                insert_order_details(conn_norm, (order_id, customer_dict[ord[0]], product_dict[ord[1]], order_date, int(ord[2])))
+
+        conn_norm.close()
+            ### END SOLUTION
 
 
 def ex1(conn, CustomerName):
