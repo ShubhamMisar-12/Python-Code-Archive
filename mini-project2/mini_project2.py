@@ -41,20 +41,92 @@ def execute_sql_statement(sql_statement, conn):
 
     return rows
 
+def insert_region(conn, values):
+    try:
+        sql = ''' INSERT INTO Region(RegionId, Region)
+                VALUES(?, ?) '''
+        cur = conn.cursor()
+        cur.execute(sql, values)
+        return cur.lastrowid
+    except Error as e:
+        print(e)
+
+def insert_country(conn, values):
+    # print(values)
+    try:
+        sql = ''' INSERT INTO Country(CountryID, Country, RegionID)
+                VALUES(?, ?, ?) '''
+        cur = conn.cursor()
+        cur.execute(sql, values)
+        return cur.lastrowid
+    except Error as e:
+        print(e)
+
+def insert_customer(conn, values):
+        try:
+            sql = ''' INSERT INTO Customer(CustomerID, FirstName, LastName, Address, City, CountryID)
+                    VALUES(?, ?, ?, ?, ?, ?) '''
+            cur = conn.cursor()
+            cur.execute(sql, values)
+            return cur.lastrowid
+        except Error as e:
+            print(e)
+
 def step1_create_region_table(data_filename, normalized_database_filename):
     # Inputs: Name of the data and normalized database filename
     # Output: None
     
     ### BEGIN SOLUTION
-    pass
+
+    ## creating table for Region
+    conn_norm = create_connection(normalized_database_filename)
+    
+    create_table_sql = """CREATE TABLE IF NOT EXISTS [Region] (
+            [RegionID] Integer not null primary key,
+            [Region] Text not null
+    ); """
+
+    create_table(conn_norm, create_table_sql)
+    
+    ## Parsing data.csv file for getting region
+
+    with open(data_filename) as file:
+        file_data = file.read()
+
+    header = None
+    region_set = []
+    for line in file_data.split("\n"):
+        if header == None:
+            header = line.split("\t")
+            continue
+        ln = line.split("\t")
+        try:
+            temp = ln[4]
+            if temp not in region_set:
+                region_set.append(temp)
+        except:
+            continue
+    region_set.sort()
+
+    ## Inserging values into Region table
+    with conn_norm:
+        region_id = 0
+        for region in region_set:
+            region_id += 1
+            insert_region(conn_norm, (region_id, region ))
+    conn_norm.close()
+
     ### END SOLUTION
 
 def step2_create_region_to_regionid_dictionary(normalized_database_filename):
     
     
     ### BEGIN SOLUTION
-    pass
-
+    conn_norm = create_connection(normalized_database_filename)
+    region_list = execute_sql_statement("SELECT * FROM Region", conn_norm)
+    region_dict = dict(map(lambda x: (x[1], x[0]), sorted(region_list)))
+    conn_norm.close()
+    return region_dict
     ### END SOLUTION
 
 
@@ -63,9 +135,48 @@ def step3_create_country_table(data_filename, normalized_database_filename):
     # Output: None
     
     ### BEGIN SOLUTION
+
+    ## Creating table Country
+    conn_norm = create_connection(normalized_database_filename)
+    sql_statement = """
+    CREATE TABLE Country(
+    [CountryID] integer not null Primary key,
+    [Country] Text not null,
+    [RegionID] integer not null, 
+    FOREIGN KEY(RegionID) REFERENCES Region(RegionID)
+    );"""
+
+
+    create_table(conn_norm, sql_statement)
+
+    with open(data_filename) as file:
+        file_data = file.read()
+
     
-    pass
-         
+    header = None
+    country_set = []
+    for line in file_data.split("\n"):
+        if header == None:
+            header = line.split("\t")
+            continue
+        ln = line.split("\t")
+        try:
+            if [ln[3], ln[4]] not in country_set:
+                country_set.append([ln[3],ln[4]])
+        except:
+            continue
+    country_set = sorted(country_set, key = lambda x : x[0])
+    #print(country_set)
+    ## Inserting into country Table
+    region_dict = step2_create_region_to_regionid_dictionary(normalized_database_filename)
+    with conn_norm:
+        country_id = 0
+        for country in country_set:
+            country_id += 1
+
+            insert_country(conn_norm, (country_id, country[0], region_dict[country[1]]))
+    
+    conn_norm.close()
     ### END SOLUTION
 
 
@@ -73,7 +184,11 @@ def step4_create_country_to_countryid_dictionary(normalized_database_filename):
     
     
     ### BEGIN SOLUTION
-    pass
+    conn_norm = create_connection(normalized_database_filename)
+    country_list = execute_sql_statement("SELECT CountryID, Country FROM Country", conn_norm)
+    country_dict = dict(map(lambda x: (x[1], x[0]), sorted(country_list)))
+    conn_norm.close()
+    return country_dict
 
     ### END SOLUTION
         
@@ -81,9 +196,47 @@ def step4_create_country_to_countryid_dictionary(normalized_database_filename):
 def step5_create_customer_table(data_filename, normalized_database_filename):
 
     ### BEGIN SOLUTION
-    
-    pass
+    conn_norm = create_connection(normalized_database_filename)
+    sql_statement = """CREATE TABLE Customer(
+    [CustomerID] integer not null Primary Key,
+    [FirstName] Text not null,
+    [LastName] Text not null,
+    [Address] Text not null,
+    [City] Text not null,
+    [CountryID] integer not null, 
+    FOREIGN KEY(CountryID) REFERENCES Country(CountryID)
+    );"""
+    create_table(conn_norm, sql_statement)
 
+
+    ## Inserting into Customer ta
+    with open(data_filename) as file:
+        file_data = file.read()
+
+    
+    header = None
+    customer_set = []
+    for line in file_data.split("\n"):
+        if header == None:
+            header = line.split("\t")
+            continue
+        ln = line.split("\t")
+        try:
+            if [ln[0], ln[1], ln[2], ln[3]] not in customer_set:
+                customer_set.append([ln[0], ln[1], ln[2], ln[3]])
+        except:
+            continue
+    country_dic = step4_create_country_to_countryid_dictionary(normalized_database_filename)
+    customer_set = sorted(customer_set, key = lambda x: x[0])
+    with conn_norm:
+        customer_id = 0
+        for customer in customer_set:
+            customer_names = customer[0].split(" ")
+            customer_last_name = " ".join(customer_names[1:])
+            customer_id += 1
+            insert_customer(conn_norm, (customer_id, customer_names[0], customer_last_name.strip() ,customer[1], customer[2], country_dic[customer[3]]))
+
+    conn_norm.close()
     ### END SOLUTION
 
 
