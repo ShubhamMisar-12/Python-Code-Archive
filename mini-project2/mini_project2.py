@@ -71,7 +71,15 @@ def insert_customer(conn, values):
             return cur.lastrowid
         except Error as e:
             print(e)
-
+def insert_product_category(conn, values):
+    try:
+        sql = ''' INSERT INTO ProductCategory(ProductCategoryID, ProductCategory, ProductCategoryDescription)
+                VALUES(?, ?, ?) '''
+        cur = conn.cursor()
+        cur.execute(sql, values)
+        return cur.lastrowid
+    except Error as e:
+        print(e)
 def step1_create_region_table(data_filename, normalized_database_filename):
     # Inputs: Name of the data and normalized database filename
     # Output: None
@@ -244,7 +252,11 @@ def step6_create_customer_to_customerid_dictionary(normalized_database_filename)
     
     
     ### BEGIN SOLUTION
-    pass
+    conn_norm = create_connection(normalized_database_filename)
+    customer_list = execute_sql_statement("SELECT CustomerID, FirstName, LastName FROM Customer", conn_norm)
+    customer_dict = dict(map(lambda x: (" ".join(x[1:]), x[0]), sorted(customer_list)))
+    conn_norm.close()
+    return customer_dict
 
     ### END SOLUTION
         
@@ -254,7 +266,45 @@ def step7_create_productcategory_table(data_filename, normalized_database_filena
 
     
     ### BEGIN SOLUTION
-    pass
+
+    ## Creating table ProductCategory
+
+    conn_norm = create_connection(normalized_database_filename)
+    sql_statement = """CREATE TABLE ProductCategory(
+    [ProductCategoryID] integer not null Primary Key,
+    [ProductCategory] Text not null,
+    [ProductCategoryDescription] Text not null
+    );"""
+    create_table(conn_norm, sql_statement)
+
+
+    ## Inserting into table ProductCategory
+    with open(data_filename) as file:
+        file_data = file.read()
+    
+    header = None
+    product_category = []
+    for line in file_data.split("\n"):
+        if header == None:
+            header = line.split("\t")
+            continue
+        ln = line.split("\t")
+        try:
+            ln6 = ln[6].split(";")
+            ln7 = ln[7].split(";")
+            for prd_cat, prd_cat_desc in zip(ln6, ln7):
+                if [prd_cat, prd_cat_desc] not in product_category:
+                    product_category.append([prd_cat, prd_cat_desc])
+        except:
+            continue
+    product_category = sorted(product_category, key =  lambda x: x[0])
+    with conn_norm:
+        product_category_id = 0
+        for prod_category in product_category:
+            product_category_id += 1
+            insert_product_category(conn_norm, (product_category_id, prod_category[0], prod_category[1]))
+
+    conn_norm.close()
    
     ### END SOLUTION
 
