@@ -51,27 +51,16 @@ def insert_region(conn, values):
         print(e)
 
 
-conn_orders = sqlite3.connect("normalized.db")
-with open('data.csv') as file:
-        file_data = file.read()
+conn = sqlite3.connect("normalized.db")
+#ProductName, ProductUnitPrice, ProductUnitPrice * QuantityOrdered as total
+cust_name = 'Alejandra Camino'
+sql_statement =  """
+    SELECT FirstName || " " || LastName as Name,  ProductName,order_customer.OrderDate,ProductUnitPrice, 
+    order_customer.QuantityOrdered, Round(ProductUnitPrice * QuantityOrdered, 2) as total FROM (SELECT * 
+    FROM Customer JOIN OrderDetail ON Customer.CustomerID = OrderDetail.CustomerID) as 
+    order_customer JOIN Product ON order_customer.ProductID = Product.ProductId WHERE name = '{}' """.format(cust_name) 
     
-header = None
-customer_set = []
-for line in file_data.split("\n"):
-    if header == None:
-        header = line.split("\t")
-        continue
-    ln = line.split("\t")
-    try:
-        if [ln[0], ln[1], ln[2], ln[3]] not in customer_set:
-            customer_set.append([ln[0], ln[1], ln[2], ln[3]])
-    except:
-        continue
-customer_set = sorted(customer_set, key = lambda x: x[0])
-conn_orders.close()
-customer_id = 0
-for customer in customer_set:
-    customer_names = customer[0].split(" ")
-    customer_last_name = " ".join(customer_names[1:])
-    customer_id += 1
-    print(customer_id, customer_names[0],customer_last_name.strip(),customer[1], customer[2], customer[3])
+
+df = pd.read_sql_query(sql_statement, conn)
+print(df)
+conn.close()    

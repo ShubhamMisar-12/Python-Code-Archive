@@ -488,8 +488,10 @@ def ex1(conn, CustomerName):
     
     ### BEGIN SOLUTION
     sql_statement = """
-    
-    """
+    SELECT FirstName || " " || LastName as Name,  ProductName,order_customer.OrderDate,ProductUnitPrice, 
+    order_customer.QuantityOrdered, Round(ProductUnitPrice * QuantityOrdered, 2) as Total FROM (SELECT * 
+    FROM Customer JOIN OrderDetail ON Customer.CustomerID = OrderDetail.CustomerID) as 
+    order_customer JOIN Product ON order_customer.ProductID = Product.ProductId WHERE name = '{}' """.format(CustomerName) 
     ### END SOLUTION
     df = pd.read_sql_query(sql_statement, conn)
     return sql_statement
@@ -504,9 +506,11 @@ def ex2(conn, CustomerName):
     # HINT: USE customer_to_customerid_dict to map customer name to customer id and then use where clause with CustomerID
     
     ### BEGIN SOLUTION
-    sql_statement = """
-    
-    """
+    sql_statement = sql_statement =  """ SELECT FirstName || " " || LastName as Name, 
+    Round(Sum(ProductUnitPrice * QuantityOrdered), 2) as Total 
+    FROM (SELECT * FROM Customer JOIN OrderDetail ON Customer.CustomerID = OrderDetail.CustomerID) as 
+    order_customer JOIN Product ON order_customer.ProductID = Product.ProductId 
+    WHERE Name = '{}' GROUP BY Name """.format(CustomerName)
     ### END SOLUTION
     df = pd.read_sql_query(sql_statement, conn)
     return sql_statement
