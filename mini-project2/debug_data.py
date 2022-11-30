@@ -54,12 +54,21 @@ def insert_region(conn, values):
 conn = sqlite3.connect("normalized.db")
 #ProductName, ProductUnitPrice, ProductUnitPrice * QuantityOrdered as total
 cust_name = 'Alejandra Camino'
-sql_statement =  """
-    SELECT FirstName || " " || LastName as Name,  ProductName,order_customer.OrderDate,ProductUnitPrice, 
-    order_customer.QuantityOrdered, Round(ProductUnitPrice * QuantityOrdered, 2) as total FROM (SELECT * 
-    FROM Customer JOIN OrderDetail ON Customer.CustomerID = OrderDetail.CustomerID) as 
-    order_customer JOIN Product ON order_customer.ProductID = Product.ProductId WHERE name = '{}' """.format(cust_name) 
-    
+# sql_statement =  """
+#     SELECT Round(ProductUnitPrice * QuantityOrdered, 2) as total FROM (SELECT * 
+#     FROM Customer JOIN OrderDetail ON Customer.CustomerID = OrderDetail.CustomerID) as 
+#     order_customer JOIN Product ON order_customer.ProductID = Product.ProductId """
+
+sql_statement = """
+        SELECT Country.Country, Round(Sum(ProductUnitPrice * QuantityOrdered),2) as CountryTotal FROM  Customer 
+        INNER JOIN OrderDetail ON Customer.CustomerID = OrderDetail.CustomerID  
+        INNER JOIN Product ON OrderDetail.ProductID = Product.ProductId
+        INNER JOIN Country ON Customer.CountryID = Country.CountryID
+        GROUP BY Country.country
+        ORDER BY CountryTotal DESC
+       
+        
+"""
 
 df = pd.read_sql_query(sql_statement, conn)
 print(df)

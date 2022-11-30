@@ -506,7 +506,7 @@ def ex2(conn, CustomerName):
     # HINT: USE customer_to_customerid_dict to map customer name to customer id and then use where clause with CustomerID
     
     ### BEGIN SOLUTION
-    sql_statement = sql_statement =  """ SELECT FirstName || " " || LastName as Name, 
+    sql_statement =  """ SELECT FirstName || " " || LastName as Name, 
     Round(Sum(ProductUnitPrice * QuantityOrdered), 2) as Total 
     FROM (SELECT * FROM Customer JOIN OrderDetail ON Customer.CustomerID = OrderDetail.CustomerID) as 
     order_customer JOIN Product ON order_customer.ProductID = Product.ProductId 
@@ -524,9 +524,11 @@ def ex3(conn):
     # Total -- which is calculated from multiplying ProductUnitPrice with QuantityOrdered -- sum first and then round to two decimal places
     # ORDER BY Total Descending 
     ### BEGIN SOLUTION
-    sql_statement = """
-    
-    """
+    sql_statement =  """ SELECT FirstName || " " || LastName as Name, 
+    Round(Sum(ProductUnitPrice * QuantityOrdered), 2) as Total 
+    FROM (SELECT * FROM Customer JOIN OrderDetail ON Customer.CustomerID = OrderDetail.CustomerID) as 
+    order_customer JOIN Product ON order_customer.ProductID = Product.ProductId 
+    GROUP BY Name ORDER BY Total DESC"""
     ### END SOLUTION
     df = pd.read_sql_query(sql_statement, conn)
     return sql_statement
@@ -542,8 +544,14 @@ def ex4(conn):
     # ORDER BY Total Descending 
     ### BEGIN SOLUTION
 
-    sql_statement = """
-    
+    sql_statement = """ 
+        SELECT Region.Region, CAST(Round(Sum(ProductUnitPrice * QuantityOrdered), 2))as Total FROM  Customer 
+        INNER JOIN OrderDetail ON Customer.CustomerID = OrderDetail.CustomerID  
+        INNER JOIN Product ON OrderDetail.ProductID = Product.ProductId
+        INNER JOIN Country ON Customer.CountryID = Country.CountryID
+        INNER JOIN Region ON Country.RegionID = Region.RegionID 
+        GROUP BY Region.Region
+        ORDER BY Total 
     """
     ### END SOLUTION
     df = pd.read_sql_query(sql_statement, conn)
