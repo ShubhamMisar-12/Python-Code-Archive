@@ -568,7 +568,12 @@ def ex5(conn):
     ### BEGIN SOLUTION
 
     sql_statement = """
-
+        SELECT Country.Country, Round(Sum(ProductUnitPrice * QuantityOrdered)) as CountryTotal FROM  Customer 
+        INNER JOIN OrderDetail ON Customer.CustomerID = OrderDetail.CustomerID  
+        INNER JOIN Product ON OrderDetail.ProductID = Product.ProductId
+        INNER JOIN Country ON Customer.CountryID = Country.CountryID
+        GROUP BY Country.country
+        ORDER BY CountryTotal DESC
     """
     ### END SOLUTION
     df = pd.read_sql_query(sql_statement, conn)
@@ -584,7 +589,14 @@ def ex6(conn):
     ### BEGIN SOLUTION
 
     sql_statement = """
-     
+        SELECT Region.Region, Country.Country, Round(Sum(ProductUnitPrice * QuantityOrdered)) As CountryTotal, 
+        rank() OVER (PARTITION BY Region.Region ORDER BY Round(Sum(ProductUnitPrice * QuantityOrdered)) DESC) CountryRegionalRank
+        FROM  Customer 
+        INNER JOIN OrderDetail ON Customer.CustomerID = OrderDetail.CustomerID  
+        INNER JOIN Product ON OrderDetail.ProductID = Product.ProductId
+        INNER JOIN Country ON Customer.CountryID = Country.CountryID
+        INNER JOIN Region ON Country.RegionID = Region.RegionID
+        GROUP BY Country.country      
     """
     ### END SOLUTION
     df = pd.read_sql_query(sql_statement, conn)
@@ -603,6 +615,8 @@ def ex7(conn):
 
     sql_statement = """
       
+                SELECT 
+
     """
     ### END SOLUTION
     df = pd.read_sql_query(sql_statement, conn)
