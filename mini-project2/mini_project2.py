@@ -41,67 +41,6 @@ def execute_sql_statement(sql_statement, conn):
 
     return rows
 
-def insert_region(conn, values):
-    try:
-        sql = ''' INSERT INTO Region(RegionId, Region)
-                VALUES(?, ?) '''
-        cur = conn.cursor()
-        cur.execute(sql, values)
-        return cur.lastrowid
-    except Error as e:
-        print(e)
-
-def insert_country(conn, values):
-    # print(values)
-    try:
-        sql = ''' INSERT INTO Country(CountryID, Country, RegionID)
-                VALUES(?, ?, ?) '''
-        cur = conn.cursor()
-        cur.execute(sql, values)
-        return cur.lastrowid
-    except Error as e:
-        print(e)
-
-def insert_customer(conn, values):
-        try:
-            sql = ''' INSERT INTO Customer(CustomerID, FirstName, LastName, Address, City, CountryID)
-                    VALUES(?, ?, ?, ?, ?, ?) '''
-            cur = conn.cursor()
-            cur.execute(sql, values)
-            return cur.lastrowid
-        except Error as e:
-            print(e)
-def insert_product_category(conn, values):
-    try:
-        sql = ''' INSERT INTO ProductCategory(ProductCategoryID, ProductCategory, ProductCategoryDescription)
-                VALUES(?, ?, ?) '''
-        cur = conn.cursor()
-        cur.execute(sql, values)
-        return cur.lastrowid
-    except Error as e:
-        print(e)
-
-def insert_product(conn, values):
-    try:
-        sql = ''' INSERT INTO Product(ProductID, ProductName, ProductUnitPrice, ProductCategoryID)
-                VALUES(?, ?, ?, ?) '''
-        cur = conn.cursor()
-        cur.execute(sql, values)
-        return cur.lastrowid
-    except Error as e:
-        print(e)
-
-def insert_order_details(conn, values):
-    try:
-        #print(values)
-        sql = ''' INSERT INTO OrderDetail(OrderID, CustomerID, ProductID, OrderDate, QuantityOrdered)
-                VALUES(?, ?, ?, ?, ?) '''
-        cur = conn.cursor()
-        cur.execute(sql, values)
-        return cur.lastrowid
-    except Error as e:
-        print(e)
-
 def step1_create_region_table(data_filename, normalized_database_filename):
     # Inputs: Name of the data and normalized database filename
     # Output: None
@@ -139,11 +78,21 @@ def step1_create_region_table(data_filename, normalized_database_filename):
     region_set.sort()
 
     ## Inserging values into Region table
+
+    region_lst = []
+    region_id = 0
+    for region in region_set:
+        region_id += 1
+        region_lst.append((region_id, region))
+
     with conn_norm:
-        region_id = 0
-        for region in region_set:
-            region_id += 1
-            insert_region(conn_norm, (region_id, region ))
+        cur = conn_norm.cursor()
+        
+        sql_insert = ''' INSERT INTO Region(RegionId, Region)
+                      VALUES(?, ?) '''
+        cur.executemany(sql_insert, region_lst)
+        conn_norm.commit()
+
     conn_norm.close()
 
     ### END SOLUTION
@@ -199,12 +148,21 @@ def step3_create_country_table(data_filename, normalized_database_filename):
     #print(country_set)
     ## Inserting into country Table
     region_dict = step2_create_region_to_regionid_dictionary(normalized_database_filename)
-    with conn_norm:
-        country_id = 0
-        for country in country_set:
-            country_id += 1
 
-            insert_country(conn_norm, (country_id, country[0], region_dict[country[1]]))
+    country_lst = []
+
+    country_id = 0
+    for country in country_set:
+        country_id += 1
+        country_lst.append((country_id, country[0], region_dict[country[1]]))
+    
+    with conn_norm:
+        cur = conn_norm.cursor()    
+        sql_insert = ''' INSERT INTO Country(CountryID, Country, RegionID)
+                VALUES(?, ?, ?) '''
+        cur.executemany(sql_insert, country_lst)
+        conn_norm.commit()
+          
     
     conn_norm.close()
     ### END SOLUTION
@@ -258,14 +216,22 @@ def step5_create_customer_table(data_filename, normalized_database_filename):
             continue
     country_dic = step4_create_country_to_countryid_dictionary(normalized_database_filename)
     customer_set = sorted(customer_set, key = lambda x: x[0])
-    with conn_norm:
-        customer_id = 0
-        for customer in customer_set:
-            customer_names = customer[0].split(" ")
-            customer_last_name = " ".join(customer_names[1:])
-            customer_id += 1
-            insert_customer(conn_norm, (customer_id, customer_names[0], customer_last_name.strip() ,customer[1], customer[2], country_dic[customer[3]]))
 
+    customer_lst = []
+    customer_id = 0
+    for customer in customer_set:
+        customer_names = customer[0].split(" ")
+        customer_last_name = " ".join(customer_names[1:])
+        customer_id += 1
+        customer_lst.append((customer_id, customer_names[0], customer_last_name.strip() ,customer[1], customer[2], country_dic[customer[3]]))
+    
+    
+    with conn_norm:
+        cur = conn_norm.cursor()    
+        sql_insert = """ INSERT INTO Customer(CustomerID, FirstName, LastName, Address, City, CountryID)
+            VALUES(?, ?, ?, ?, ?, ?) """
+        cur.executemany(sql_insert, customer_lst)
+        conn_norm.commit()
     conn_norm.close()
     ### END SOLUTION
 
@@ -320,12 +286,20 @@ def step7_create_productcategory_table(data_filename, normalized_database_filena
         except:
             continue
     product_category = sorted(product_category, key =  lambda x: x[0])
-    with conn_norm:
-        product_category_id = 0
-        for prod_category in product_category:
-            product_category_id += 1
-            insert_product_category(conn_norm, (product_category_id, prod_category[0], prod_category[1]))
+    product_category_lst = []
+    product_category_id = 0
+    for prod_category in product_category:
+        product_category_id += 1
+        product_category_lst.append((product_category_id, prod_category[0], prod_category[1]))
 
+    
+    with conn_norm:
+        cur = conn_norm.cursor()    
+        sql_insert = ''' INSERT INTO ProductCategory(ProductCategoryID, ProductCategory, ProductCategoryDescription)
+                VALUES(?, ?, ?) '''
+        cur.executemany(sql_insert, product_category_lst)
+        conn_norm.commit()
+    
     conn_norm.close()
    
     ### END SOLUTION
@@ -391,13 +365,20 @@ def step9_create_product_table(data_filename, normalized_database_filename):
     #print(product)
     product = sorted(product, key = lambda x: x[0])
     product_category_dict = step8_create_productcategory_to_productcategoryid_dictionary(normalized_database_filename)
+    product_lst = []
+    product_id = 0
+    for prod in product:
+        #print(prod)
+        product_id += 1
+        #print((product_id, prod[0], prod[2], product_category_dict[prod[1]]))
+        product_lst.append((product_id, prod[0], float(prod[2]), product_category_dict[prod[1]]))
+
     with conn_norm:
-        product_id = 0
-        for prod in product:
-            #print(prod)
-            product_id += 1
-            #print((product_id, prod[0], prod[2], product_category_dict[prod[1]]))
-            insert_product(conn_norm, (product_id, prod[0], float(prod[2]), product_category_dict[prod[1]]))
+        cur = conn_norm.cursor()    
+        sql_insert = '''  INSERT INTO Product(ProductID, ProductName, ProductUnitPrice, ProductCategoryID)
+                VALUES(?, ?, ?, ?) '''
+        cur.executemany(sql_insert, product_lst)
+        conn_norm.commit()
 
     conn_norm.close()
    
@@ -462,12 +443,24 @@ def step11_create_orderdetail_table(data_filename, normalized_database_filename)
         customer_dict = step6_create_customer_to_customerid_dictionary(normalized_database_filename)
         product_dict = step10_create_product_to_productid_dictionary(normalized_database_filename)
         #print(product)
+        
+        order_lst = []
+
+        order_id = 0
+        for ord in order:
+            order_id += 1
+            order_date = datetime.datetime.strptime(ord[3], '%Y%m%d').strftime('%Y-%m-%d')
+            order_lst.append((order_id, customer_dict[ord[0]], product_dict[ord[1]], order_date, int(ord[2])))
+
+
         with conn_norm:
-            order_id = 0
-            for ord in order:
-                order_id += 1
-                order_date = datetime.datetime.strptime(ord[3], '%Y%m%d').strftime('%Y-%m-%d')
-                insert_order_details(conn_norm, (order_id, customer_dict[ord[0]], product_dict[ord[1]], order_date, int(ord[2])))
+            cur = conn_norm.cursor()    
+            sql_insert = ''' INSERT INTO OrderDetail(OrderID, CustomerID, ProductID, OrderDate, QuantityOrdered)
+                            VALUES(?, ?, ?, ?, ?) '''
+
+            cur.executemany(sql_insert, order_lst)
+            conn_norm.commit()
+
 
         conn_norm.close()
             ### END SOLUTION

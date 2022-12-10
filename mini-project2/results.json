@@ -121,9 +121,8 @@
         },
         {
             "name": "test_z_ex4 (test_mini_project2.TestMiniProject2)",
-            "score": 0.0,
+            "score": 5,
             "max_score": 5,
-            "output": "Test Failed: Execution failed on sql ' \n        SELECT Region.Region, CAST(Round(Sum(ProductUnitPrice * QuantityOrdered), 2))as Total FROM  Customer \n        INNER JOIN OrderDetail ON Customer.CustomerID = OrderDetail.CustomerID  \n        INNER JOIN Product ON OrderDetail.ProductID = Product.ProductId\n        INNER JOIN Country ON Customer.CountryID = Country.CountryID\n        INNER JOIN Region ON Country.RegionID = Region.RegionID \n        GROUP BY Region.Region\n        ORDER BY Total \n    ': near \")\": syntax error\n",
             "visibility": "visible",
             "number": "z_ex4"
         },
@@ -146,15 +145,14 @@
             "name": "test_z_ex7 (test_mini_project2.TestMiniProject2)",
             "score": 0.0,
             "max_score": 10,
-            "output": "Test Failed: Execution failed on sql '\n      \n            WITH CRRank As(\n            SELECT Region.Region, Country.Country, Round(Sum(ProductUnitPrice * QuantityOrdered)) As Total, \n            rank() OVER (PARTITION BY Region.Region ORDER BY Round(Sum(ProductUnitPrice * QuantityOrdered)) DESC) Rank\n            FROM  Customer \n            INNER JOIN OrderDetail ON Customer.CustomerID = OrderDetail.CustomerID  \n            INNER JOIN Product ON OrderDetail.ProductID = Product.ProductId\n            INNER JOIN Country ON Customer.CountryID = Country.CountryID\n            INNER JOIN Region ON Country.RegionID = Region.RegionID\n            GROUP BY Country.country)\n        SELECT * FROM CRRank WHERE Rank = 1\n    ': near \"(\": syntax error\n",
+            "output": "Test Failed: Execution failed on sql '\n      \n            WITH CRRank As(\n            SELECT Region.Region, Country.Country, Round(Sum(ProductUnitPrice * QuantityOrdered)) As CountryTotal, \n            rank() OVER (PARTITION BY Region.Region ORDER BY Round(Sum(ProductUnitPrice * QuantityOrdered)) DESC) CountryRegionalRank\n            FROM  Customer \n            INNER JOIN OrderDetail ON Customer.CustomerID = OrderDetail.CustomerID  \n            INNER JOIN Product ON OrderDetail.ProductID = Product.ProductId\n            INNER JOIN Country ON Customer.CountryID = Country.CountryID\n            INNER JOIN Region ON Country.RegionID = Region.RegionID\n            GROUP BY Country.country)\n        SELECT * FROM CRRank WHERE CountryRegionalRank = 1\n    ': near \"(\": syntax error\n",
             "visibility": "visible",
             "number": "z_ex7"
         },
         {
             "name": "test_z_ex8 (test_mini_project2.TestMiniProject2)",
-            "score": 0.0,
+            "score": 10,
             "max_score": 10,
-            "output": "Test Failed: 'NoneType' object is not iterable\n",
             "visibility": "visible",
             "number": "z_ex8"
         },
@@ -162,7 +160,7 @@
             "name": "test_z_ex9 (test_mini_project2.TestMiniProject2)",
             "score": 0.0,
             "max_score": 10,
-            "output": "Test Failed: 'NoneType' object is not iterable\n",
+            "output": "Test Failed: Execution failed on sql '\n\n        WITH QuaterYear AS(\n        SELECT\n        CASE\n            WHEN 0 + strftime('%m', OrderDetail.OrderDate) BETWEEN 1\n            AND 3 THEN 'Q1'\n            WHEN 0 + strftime('%m', OrderDetail.OrderDate) BETWEEN 4\n            AND 6 THEN 'Q2'\n            WHEN 0 + strftime('%m', OrderDetail.OrderDate) BETWEEN 7\n            AND 9 THEN 'Q3'\n            WHEN 0 + strftime('%m', OrderDetail.OrderDate) BETWEEN 10\n            AND 12 THEN 'Q4'\n        END Quarter,\n        cast(strftime('%Y', OrderDetail.OrderDate) AS INT) Year,\n        Customer.CustomerID, Round(Sum(ProductUnitPrice * QuantityOrdered)) as Total \n        FROM  Customer \n        INNER JOIN OrderDetail ON Customer.CustomerID = OrderDetail.CustomerID  \n        INNER JOIN Product ON OrderDetail.ProductID = Product.ProductId\n        GROUP BY Quarter, Year, Customer.CustomerID\n        ORDER BY Year\n        ) \n        \n    SELECT * FROM (SELECT *,\n    rank() OVER(Partition by quarter,year ORDER BY Total DESC) CustomerRank\n    FROM QuaterYear Order by year) WHERE CustomerRank <= 5            \n    ': near \"(\": syntax error\n",
             "visibility": "visible",
             "number": "z_ex9"
         },
@@ -170,7 +168,7 @@
             "name": "test_z_ex_10 (test_mini_project2.TestMiniProject2)",
             "score": 0.0,
             "max_score": 10,
-            "output": "Test Failed: 'NoneType' object is not iterable\n",
+            "output": "Test Failed: Execution failed on sql '\n      WITH MonthlySale as(\n        SELECT\n        CASE\n                WHEN strftime('%m', orderdate) = '01' THEN 'January'\n                WHEN strftime('%m', orderdate) = '02' THEN 'February'\n                WHEN strftime('%m', orderdate) = '03' THEN 'March'\n                WHEN strftime('%m', orderdate) = '04' THEN 'April'\n                WHEN strftime('%m', orderdate) = '05' THEN 'May'\n                WHEN strftime('%m', orderdate) = '06' THEN 'June'\n                WHEN strftime('%m', orderdate) = '07' THEN 'July'\n                WHEN strftime('%m', orderdate) = '08' THEN 'August'\n                WHEN strftime('%m', orderdate) = '09' THEN 'September'\n                WHEN strftime('%m', orderdate) = '10' THEN 'October'\n                WHEN strftime('%m', orderdate) = '11' THEN 'November'\n                WHEN strftime('%m', orderdate) = '12' THEN 'December'\n            END Month,\n            sum(round(ProductUnitPrice*QuantityOrdered)) as Total FROM OrderDetail \n            inner join Product on OrderDetail.ProductID=Product.ProductID Group by Month order by Total desc)\n        \n    select *, RANK () OVER (order by Total Desc) TotalRank from MonthlySale\n    ': near \"(\": syntax error\n",
             "visibility": "visible",
             "number": "z_ex_10"
         },
@@ -185,6 +183,6 @@
     ],
     "leaderboard": [],
     "visibility": "visible",
-    "execution_time": "21.46",
-    "score": 120.0
+    "execution_time": "29.79",
+    "score": 135.0
 }
