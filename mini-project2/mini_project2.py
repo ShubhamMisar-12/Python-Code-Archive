@@ -491,7 +491,8 @@ def ex1(conn, CustomerName):
     SELECT FirstName || " " || LastName as Name,  ProductName,order_customer.OrderDate,ProductUnitPrice, 
     order_customer.QuantityOrdered, Round(ProductUnitPrice * QuantityOrdered, 2) as Total FROM (SELECT * 
     FROM Customer JOIN OrderDetail ON Customer.CustomerID = OrderDetail.CustomerID) as 
-    order_customer JOIN Product ON order_customer.ProductID = Product.ProductId WHERE name = '{}' """.format(CustomerName) 
+    order_customer JOIN Product ON order_customer.ProductID = Product.ProductId 
+    WHERE name = '{}' """.format(CustomerName) 
     ### END SOLUTION
     df = pd.read_sql_query(sql_statement, conn)
     return sql_statement
@@ -545,13 +546,13 @@ def ex4(conn):
     ### BEGIN SOLUTION
 
     sql_statement = """ 
-        SELECT Region.Region, Round(Sum(ProductUnitPrice * QuantityOrdered), 2) as Total FROM  Customer 
-        INNER JOIN OrderDetail ON Customer.CustomerID = OrderDetail.CustomerID  
+        SELECT Region.Region, Round(Sum(ProductUnitPrice * QuantityOrdered), 2) as Total FROM  OrderDetail 
+        INNER JOIN Customer ON Customer.CustomerID = OrderDetail.CustomerID  
         INNER JOIN Product ON OrderDetail.ProductID = Product.ProductId
         INNER JOIN Country ON Customer.CountryID = Country.CountryID
         INNER JOIN Region ON Country.RegionID = Region.RegionID 
         GROUP BY Region.Region
-        ORDER BY Total 
+        ORDER BY Total DESC 
     """
     ### END SOLUTION
     df = pd.read_sql_query(sql_statement, conn)
@@ -640,7 +641,7 @@ def ex8(conn):
     ### BEGIN SOLUTION
 
     sql_statement = """
-       SELECT
+      SELECT
         CASE
             WHEN 0 + strftime('%m', OrderDetail.OrderDate) BETWEEN 1
             AND 3 THEN 'Q1'
@@ -652,7 +653,7 @@ def ex8(conn):
             AND 12 THEN 'Q4'
         END Quarter,
         cast(strftime('%Y', OrderDetail.OrderDate) AS INT) Year,
-        Customer.CustomerID, Round(Sum(ProductUnitPrice * QuantityOrdered), 2) as Total 
+        Customer.CustomerID, Round(Sum(ProductUnitPrice * QuantityOrdered)) as Total 
         FROM  Customer 
         INNER JOIN OrderDetail ON Customer.CustomerID = OrderDetail.CustomerID  
         INNER JOIN Product ON OrderDetail.ProductID = Product.ProductId
@@ -678,7 +679,31 @@ def ex9(conn):
     ### BEGIN SOLUTION
 
     sql_statement = """
-                    
+
+        WITH QuaterYear AS(
+        SELECT
+        CASE
+            WHEN 0 + strftime('%m', OrderDetail.OrderDate) BETWEEN 1
+            AND 3 THEN 'Q1'
+            WHEN 0 + strftime('%m', OrderDetail.OrderDate) BETWEEN 4
+            AND 6 THEN 'Q2'
+            WHEN 0 + strftime('%m', OrderDetail.OrderDate) BETWEEN 7
+            AND 9 THEN 'Q3'
+            WHEN 0 + strftime('%m', OrderDetail.OrderDate) BETWEEN 10
+            AND 12 THEN 'Q4'
+        END Quarter,
+        cast(strftime('%Y', OrderDetail.OrderDate) AS INT) Year,
+        Customer.CustomerID, Round(Sum(ProductUnitPrice * QuantityOrdered)) as Total 
+        FROM  Customer 
+        INNER JOIN OrderDetail ON Customer.CustomerID = OrderDetail.CustomerID  
+        INNER JOIN Product ON OrderDetail.ProductID = Product.ProductId
+        GROUP BY Quarter, Year, Customer.CustomerID
+        ORDER BY Year
+        ) 
+        
+    SELECT * FROM (SELECT *,
+    rank() OVER(Partition by quarter,year ORDER BY Total DESC) CustomerRank
+    FROM QuaterYear Order by year) WHERE CustomerRank <= 5            
     """
     ### END SOLUTION
     df = pd.read_sql_query(sql_statement, conn)
@@ -693,7 +718,26 @@ def ex10(conn):
     ### BEGIN SOLUTION
 
     sql_statement = """
-      
+      WITH MonthlySale as(
+        SELECT
+        CASE
+                WHEN strftime('%m', orderdate) = '01' THEN 'January'
+                WHEN strftime('%m', orderdate) = '02' THEN 'February'
+                WHEN strftime('%m', orderdate) = '03' THEN 'March'
+                WHEN strftime('%m', orderdate) = '04' THEN 'April'
+                WHEN strftime('%m', orderdate) = '05' THEN 'May'
+                WHEN strftime('%m', orderdate) = '06' THEN 'June'
+                WHEN strftime('%m', orderdate) = '07' THEN 'July'
+                WHEN strftime('%m', orderdate) = '08' THEN 'August'
+                WHEN strftime('%m', orderdate) = '09' THEN 'September'
+                WHEN strftime('%m', orderdate) = '10' THEN 'October'
+                WHEN strftime('%m', orderdate) = '11' THEN 'November'
+                WHEN strftime('%m', orderdate) = '12' THEN 'December'
+            END Month,
+            sum(round(ProductUnitPrice*QuantityOrdered)) as Total FROM OrderDetail 
+            inner join Product on OrderDetail.ProductID=Product.ProductID Group by Month order by Total desc)
+        
+    select *, RANK () OVER (order by Total Desc) TotalRank from MonthlySale
     """
     ### END SOLUTION
     df = pd.read_sql_query(sql_statement, conn)
