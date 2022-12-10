@@ -59,17 +59,24 @@ cust_name = 'Alejandra Camino'
 #     FROM Customer JOIN OrderDetail ON Customer.CustomerID = OrderDetail.CustomerID) as 
 #     order_customer JOIN Product ON order_customer.ProductID = Product.ProductId """
 
-sql_statement = """
-        SELECT Country.Country, Round(Sum(ProductUnitPrice * QuantityOrdered),2) as CountryTotal FROM  Customer 
-        INNER JOIN OrderDetail ON Customer.CustomerID = OrderDetail.CustomerID  
-        INNER JOIN Product ON OrderDetail.ProductID = Product.ProductId
-        INNER JOIN Country ON Customer.CountryID = Country.CountryID
-        GROUP BY Country.country
-        ORDER BY CountryTotal DESC
+# sql_statement = """
+#         SELECT Country.Country, Region.Region, Round(Sum(ProductUnitPrice * QuantityOrdered),2) as CountryTotal, 
+#         RANK() OVER (ORDER BY CountryTotal) Rank FROM Customer 
+#         INNER JOIN OrderDetail ON Customer.CustomerID = OrderDetail.CustomerID  
+#         INNER JOIN Product ON OrderDetail.ProductID = Product.ProductId
+#         INNER JOIN Country ON Customer.CountryID = Country.CountryID
+#         INNER JOIN Region ON Country.RegionID = Region.RegionID
+        
+        
        
         
-"""
+# """
 
+sql_statement = """ 
+        SELECT FirstName,
+        Rank() OVER(ORDER BY LastName) Rank FROM Customer
+          
+"""
 df = pd.read_sql_query(sql_statement, conn)
 print(df)
 conn.close()    

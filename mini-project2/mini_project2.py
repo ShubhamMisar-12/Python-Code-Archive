@@ -615,8 +615,16 @@ def ex7(conn):
 
     sql_statement = """
       
-                SELECT 
-
+            WITH CRRank As(
+            SELECT Region.Region, Country.Country, Round(Sum(ProductUnitPrice * QuantityOrdered)) As Total, 
+            rank() OVER (PARTITION BY Region.Region ORDER BY Round(Sum(ProductUnitPrice * QuantityOrdered))) Rank
+            FROM  Customer 
+            INNER JOIN OrderDetail ON Customer.CustomerID = OrderDetail.CustomerID  
+            INNER JOIN Product ON OrderDetail.ProductID = Product.ProductId
+            INNER JOIN Country ON Customer.CountryID = Country.CountryID
+            INNER JOIN Region ON Country.RegionID = Region.RegionID
+            GROUP BY Country.country)
+        SELECT * FROM CRRank WHERE Rank = 1
     """
     ### END SOLUTION
     df = pd.read_sql_query(sql_statement, conn)

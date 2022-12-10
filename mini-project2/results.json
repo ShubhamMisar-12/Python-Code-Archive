@@ -1,0 +1,190 @@
+{
+    "tests": [
+        {
+            "name": "test_step1 (test_mini_project2.TestMiniProject2)",
+            "score": 5,
+            "max_score": 5,
+            "visibility": "visible",
+            "number": "step1"
+        },
+        {
+            "name": "test_step2 (test_mini_project2.TestMiniProject2)",
+            "score": 5,
+            "max_score": 5,
+            "visibility": "visible",
+            "number": "step2"
+        },
+        {
+            "name": "test_step3 (test_mini_project2.TestMiniProject2)",
+            "score": 5,
+            "max_score": 5,
+            "visibility": "visible",
+            "number": "step3"
+        },
+        {
+            "name": "test_step4 (test_mini_project2.TestMiniProject2)",
+            "score": 5,
+            "max_score": 5,
+            "visibility": "visible",
+            "number": "step4"
+        },
+        {
+            "name": "test_step5 (test_mini_project2.TestMiniProject2)",
+            "score": 5,
+            "max_score": 5,
+            "visibility": "visible",
+            "number": "step5"
+        },
+        {
+            "name": "test_step6 (test_mini_project2.TestMiniProject2)",
+            "score": 5,
+            "max_score": 5,
+            "visibility": "visible",
+            "number": "step6"
+        },
+        {
+            "name": "test_step7 (test_mini_project2.TestMiniProject2)",
+            "score": 5,
+            "max_score": 5,
+            "visibility": "visible",
+            "number": "step7"
+        },
+        {
+            "name": "test_step8 (test_mini_project2.TestMiniProject2)",
+            "score": 5,
+            "max_score": 5,
+            "visibility": "visible",
+            "number": "step8"
+        },
+        {
+            "name": "test_step9 (test_mini_project2.TestMiniProject2)",
+            "score": 5,
+            "max_score": 5,
+            "visibility": "visible",
+            "number": "step9"
+        },
+        {
+            "name": "test_step_10 (test_mini_project2.TestMiniProject2)",
+            "score": 5,
+            "max_score": 5,
+            "visibility": "visible",
+            "number": "step_10"
+        },
+        {
+            "name": "test_step_11_1 (test_mini_project2.TestMiniProject2)",
+            "score": 20,
+            "max_score": 20,
+            "visibility": "visible",
+            "number": "step_11_1"
+        },
+        {
+            "name": "test_step_11_2 (test_mini_project2.TestMiniProject2)",
+            "score": 20,
+            "max_score": 20,
+            "visibility": "visible",
+            "number": "step_11_2"
+        },
+        {
+            "name": "test_z_ex1_1 (test_mini_project2.TestMiniProject2)",
+            "score": 5,
+            "max_score": 5,
+            "visibility": "visible",
+            "number": "z_ex1_1"
+        },
+        {
+            "name": "test_z_ex1_2 (test_mini_project2.TestMiniProject2)",
+            "score": 5,
+            "max_score": 5,
+            "visibility": "visible",
+            "number": "z_ex1_2"
+        },
+        {
+            "name": "test_z_ex2_1 (test_mini_project2.TestMiniProject2)",
+            "score": 5,
+            "max_score": 5,
+            "visibility": "visible",
+            "number": "z_ex2_1"
+        },
+        {
+            "name": "test_z_ex2_2 (test_mini_project2.TestMiniProject2)",
+            "score": 5,
+            "max_score": 5,
+            "visibility": "visible",
+            "number": "z_ex2_2"
+        },
+        {
+            "name": "test_z_ex3 (test_mini_project2.TestMiniProject2)",
+            "score": 5,
+            "max_score": 5,
+            "visibility": "visible",
+            "number": "z_ex3"
+        },
+        {
+            "name": "test_z_ex4 (test_mini_project2.TestMiniProject2)",
+            "score": 0.0,
+            "max_score": 5,
+            "output": "Test Failed: Execution failed on sql ' \n        SELECT Region.Region, CAST(Round(Sum(ProductUnitPrice * QuantityOrdered), 2))as Total FROM  Customer \n        INNER JOIN OrderDetail ON Customer.CustomerID = OrderDetail.CustomerID  \n        INNER JOIN Product ON OrderDetail.ProductID = Product.ProductId\n        INNER JOIN Country ON Customer.CountryID = Country.CountryID\n        INNER JOIN Region ON Country.RegionID = Region.RegionID \n        GROUP BY Region.Region\n        ORDER BY Total \n    ': near \")\": syntax error\n",
+            "visibility": "visible",
+            "number": "z_ex4"
+        },
+        {
+            "name": "test_z_ex5 (test_mini_project2.TestMiniProject2)",
+            "score": 5,
+            "max_score": 5,
+            "visibility": "visible",
+            "number": "z_ex5"
+        },
+        {
+            "name": "test_z_ex6 (test_mini_project2.TestMiniProject2)",
+            "score": 0.0,
+            "max_score": 10,
+            "output": "Test Failed: Execution failed on sql '\n        SELECT Region.Region, Country.Country, Round(Sum(ProductUnitPrice * QuantityOrdered)) As CountryTotal, \n        rank() OVER (PARTITION BY Region.Region ORDER BY Round(Sum(ProductUnitPrice * QuantityOrdered)) DESC) CountryRegionalRank\n        FROM  Customer \n        INNER JOIN OrderDetail ON Customer.CustomerID = OrderDetail.CustomerID  \n        INNER JOIN Product ON OrderDetail.ProductID = Product.ProductId\n        INNER JOIN Country ON Customer.CountryID = Country.CountryID\n        INNER JOIN Region ON Country.RegionID = Region.RegionID\n        GROUP BY Country.country      \n    ': near \"(\": syntax error\n",
+            "visibility": "visible",
+            "number": "z_ex6"
+        },
+        {
+            "name": "test_z_ex7 (test_mini_project2.TestMiniProject2)",
+            "score": 0.0,
+            "max_score": 10,
+            "output": "Test Failed: 'NoneType' object is not iterable\n",
+            "visibility": "visible",
+            "number": "z_ex7"
+        },
+        {
+            "name": "test_z_ex8 (test_mini_project2.TestMiniProject2)",
+            "score": 0.0,
+            "max_score": 10,
+            "output": "Test Failed: 'NoneType' object is not iterable\n",
+            "visibility": "visible",
+            "number": "z_ex8"
+        },
+        {
+            "name": "test_z_ex9 (test_mini_project2.TestMiniProject2)",
+            "score": 0.0,
+            "max_score": 10,
+            "output": "Test Failed: 'NoneType' object is not iterable\n",
+            "visibility": "visible",
+            "number": "z_ex9"
+        },
+        {
+            "name": "test_z_ex_10 (test_mini_project2.TestMiniProject2)",
+            "score": 0.0,
+            "max_score": 10,
+            "output": "Test Failed: 'NoneType' object is not iterable\n",
+            "visibility": "visible",
+            "number": "z_ex_10"
+        },
+        {
+            "name": "test_z_ex_11 (test_mini_project2.TestMiniProject2)",
+            "score": 0.0,
+            "max_score": 10,
+            "output": "Test Failed: 'NoneType' object is not iterable\n",
+            "visibility": "visible",
+            "number": "z_ex_11"
+        }
+    ],
+    "leaderboard": [],
+    "visibility": "visible",
+    "execution_time": "19.59",
+    "score": 120.0
+}
