@@ -545,7 +545,7 @@ def ex4(conn):
     ### BEGIN SOLUTION
 
     sql_statement = """ 
-        SELECT Region.Region, CAST(Round(Sum(ProductUnitPrice * QuantityOrdered), 2))as Total FROM  Customer 
+        SELECT Region.Region, Round(Sum(ProductUnitPrice * QuantityOrdered), 2) as Total FROM  Customer 
         INNER JOIN OrderDetail ON Customer.CustomerID = OrderDetail.CustomerID  
         INNER JOIN Product ON OrderDetail.ProductID = Product.ProductId
         INNER JOIN Country ON Customer.CountryID = Country.CountryID
@@ -616,15 +616,15 @@ def ex7(conn):
     sql_statement = """
       
             WITH CRRank As(
-            SELECT Region.Region, Country.Country, Round(Sum(ProductUnitPrice * QuantityOrdered)) As Total, 
-            rank() OVER (PARTITION BY Region.Region ORDER BY Round(Sum(ProductUnitPrice * QuantityOrdered))) Rank
+            SELECT Region.Region, Country.Country, Round(Sum(ProductUnitPrice * QuantityOrdered)) As CountryTotal, 
+            rank() OVER (PARTITION BY Region.Region ORDER BY Round(Sum(ProductUnitPrice * QuantityOrdered)) DESC) CountryRegionalRank
             FROM  Customer 
             INNER JOIN OrderDetail ON Customer.CustomerID = OrderDetail.CustomerID  
             INNER JOIN Product ON OrderDetail.ProductID = Product.ProductId
             INNER JOIN Country ON Customer.CountryID = Country.CountryID
             INNER JOIN Region ON Country.RegionID = Region.RegionID
             GROUP BY Country.country)
-        SELECT * FROM CRRank WHERE Rank = 1
+        SELECT * FROM CRRank WHERE CountryRegionalRank = 1
     """
     ### END SOLUTION
     df = pd.read_sql_query(sql_statement, conn)
@@ -640,7 +640,27 @@ def ex8(conn):
     ### BEGIN SOLUTION
 
     sql_statement = """
-       
+       SELECT
+        CASE
+            WHEN 0 + strftime('%m', OrderDetail.OrderDate) BETWEEN 1
+            AND 3 THEN 'Q1'
+            WHEN 0 + strftime('%m', OrderDetail.OrderDate) BETWEEN 4
+            AND 6 THEN 'Q2'
+            WHEN 0 + strftime('%m', OrderDetail.OrderDate) BETWEEN 7
+            AND 9 THEN 'Q3'
+            WHEN 0 + strftime('%m', OrderDetail.OrderDate) BETWEEN 10
+            AND 12 THEN 'Q4'
+        END Quarter,
+        cast(strftime('%Y', OrderDetail.OrderDate) AS INT) Year,
+        Customer.CustomerID, Round(Sum(ProductUnitPrice * QuantityOrdered), 2) as Total 
+        FROM  Customer 
+        INNER JOIN OrderDetail ON Customer.CustomerID = OrderDetail.CustomerID  
+        INNER JOIN Product ON OrderDetail.ProductID = Product.ProductId
+        INNER JOIN Country ON Customer.CountryID = Country.CountryID
+        INNER JOIN Region ON Country.RegionID = Region.RegionID 
+        GROUP BY Quarter, Year, Customer.CustomerID
+        ORDER BY Year 
+        
     """
     ### END SOLUTION
     df = pd.read_sql_query(sql_statement, conn)
@@ -658,7 +678,7 @@ def ex9(conn):
     ### BEGIN SOLUTION
 
     sql_statement = """
-    
+                    
     """
     ### END SOLUTION
     df = pd.read_sql_query(sql_statement, conn)

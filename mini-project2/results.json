@@ -146,7 +146,7 @@
             "name": "test_z_ex7 (test_mini_project2.TestMiniProject2)",
             "score": 0.0,
             "max_score": 10,
-            "output": "Test Failed: 'NoneType' object is not iterable\n",
+            "output": "Test Failed: Execution failed on sql '\n      \n            WITH CRRank As(\n            SELECT Region.Region, Country.Country, Round(Sum(ProductUnitPrice * QuantityOrdered)) As Total, \n            rank() OVER (PARTITION BY Region.Region ORDER BY Round(Sum(ProductUnitPrice * QuantityOrdered)) DESC) Rank\n            FROM  Customer \n            INNER JOIN OrderDetail ON Customer.CustomerID = OrderDetail.CustomerID  \n            INNER JOIN Product ON OrderDetail.ProductID = Product.ProductId\n            INNER JOIN Country ON Customer.CountryID = Country.CountryID\n            INNER JOIN Region ON Country.RegionID = Region.RegionID\n            GROUP BY Country.country)\n        SELECT * FROM CRRank WHERE Rank = 1\n    ': near \"(\": syntax error\n",
             "visibility": "visible",
             "number": "z_ex7"
         },
@@ -185,6 +185,6 @@
     ],
     "leaderboard": [],
     "visibility": "visible",
-    "execution_time": "19.59",
+    "execution_time": "21.46",
     "score": 120.0
 }
