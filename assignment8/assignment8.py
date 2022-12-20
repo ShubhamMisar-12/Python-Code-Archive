@@ -18,11 +18,11 @@ def ex1():
             continue
         entries = line.split("\t")
         data_lst.append(entries)
-        datetimeObj = datetime.strptime(entries[2], '%Y-%m-%d %H:%M:%S.%f')
-        if datetimeObj.month not in month_dic.keys():
-            month_dic[datetimeObj.month] = 1
+        datep = datetime.strptime(entries[2], '%Y-%m-%d %H:%M:%S.%f')
+        if datep.month not in month_dic.keys():
+            month_dic[datep.month] = 1
         else:
-            month_dic[datetimeObj.month] = month_dic[datetimeObj.month] + 1
+            month_dic[datep.month] = month_dic[datep.month] + 1
     month_sorted= sorted(month_dic, key = lambda month: -month_dic[month])
     month_names = {1:'January', 2:'February', 3:'March', 4:'April', 5:'May', 6:'June', 7:'July', 8:'August', 9:'September', 
               10:'October' , 11:'November', 12:'December'}
@@ -49,6 +49,7 @@ def ex2():
     """
 
     # BEGIN SOLUTION
+    import csv
     data_lst = []
     with open('AdmissionsCorePopulatedTable.txt') as f:
         data = f.read()
@@ -74,15 +75,11 @@ def ex2():
     for i in range(1,13):
         lines.append([Quater[i], month_names[i], month_dic[i]])
     
-    import csv
+
     with open('ex2.tsv', 'w', newline='') as f:
-        #csv writer to write in tsv file
         tsv_writer = csv.writer(f, delimiter='\t')
-        #write header in tsv file
         tsv_writer.writerow(header)
-        #write rows
         tsv_writer.writerows(lines)
-        #close csv file
         f.close()
         
 
