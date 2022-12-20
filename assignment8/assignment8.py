@@ -53,7 +53,43 @@ def ex2():
     """
 
     # BEGIN SOLUTION
-    pass
+    data_lst = []
+    with open('AdmissionsCorePopulatedTable.txt') as f:
+        data = f.read()
+    from datetime import datetime
+    month_dic = {}
+    header = None
+    for line in data.strip().split("\n"):
+        if header is None:
+            header = line.split("\t")
+            continue
+        entries = line.split("\t")
+        data_lst.append(entries)
+        datetimeObj = datetime.strptime(entries[2], '%Y-%m-%d %H:%M:%S.%f')
+        if datetimeObj.month not in month_dic.keys():
+            month_dic[datetimeObj.month] = 1
+        else:
+            month_dic[datetimeObj.month] = month_dic[datetimeObj.month] + 1
+    month_names = {1:'January', 2:'February', 3:'March', 4:'April', 5:'May', 6:'June', 7:'July', 8:'August', 9:'September', 
+              10:'October' , 11:'November', 12:'December'}
+    Quater = {1: 'Q1', 2: 'Q1', 3: 'Q1', 4: 'Q2', 5: 'Q2', 6:'Q2', 7: 'Q3', 8:'Q3', 9: 'Q3', 10: 'Q4', 11: 'Q4', 12:'Q4'}
+    header = ['Quarter','AdmissionMonth', 'AdmissionCount']
+    lines = []
+    for i in range(1,13):
+        lines.append([Quater[i], month_names[i], month_dic[i]])
+    
+    import csv
+    with open('ex2.tsv', 'w', newline='') as f:
+        #csv writer to write in tsv file
+        tsv_writer = csv.writer(f, delimiter='\t')
+        #write header in tsv file
+        tsv_writer.writerow(header)
+        #write rows
+        tsv_writer.writerows(lines)
+        #close csv file
+        f.close()
+        
+
     # END SOLUTION
 
 
