@@ -69,12 +69,9 @@ def step4(df):
     """
     # BEGIN SOLUTION
 
-    sex_enc = {'male': 1, 'female': 0}
-    embarked_enc = {'S': 2, 'C': 0, 'Q': 1}
-    df = df.replace({'Sex':sex_enc, 'Embarked':embarked_enc})
-    
 
-    return df
+    return df.replace({'Sex':{'male': 1, 'female': 0}, 'Embarked':{'S': 2, 'C': 0, 'Q': 1}})
+    
     # END SOLUTION
     # return df
 
@@ -88,8 +85,8 @@ def step5(df):
     """
     # BEGIN SOLUTION
     
-    cat_cols = ['Pclass', 'Sex', 'Embarked', 'Survived']
-    df[cat_cols] = df[cat_cols].apply(lambda c: c.astype('category'))
+    feature_cols = ['Pclass', 'Sex', 'Embarked', 'Survived']
+    df[feature_cols] = df[feature_cols].apply(lambda x: x.astype('category'))
 
     return df
     # END SOLUTION
@@ -120,33 +117,36 @@ def step6(df):
     from sklearn import metrics
     from sklearn import linear_model
 
-    # Intitial Split
+   
 
-    data = df.drop("Survived", axis = 1)
-    labels = df["Survived"]
+    features= df.drop("Survived", axis = 1)
+    response = df["Survived"]
 
-    # Train and Test
-
-    train_data, test_data, train_label, test_label = train_test_split(data, labels, test_size = 0.25, random_state = 1, stratify = df["Survived"])
-
-    # Fitting the model 
     
-    log_fit = linear_model.LogisticRegression().fit(X = train_data, y = train_label)
-    log_pred = log_fit.predict(test_data)
+
+    train_data, test_data, train_label, test_label = train_test_split(features, response, test_size = 0.25, random_state = 1, stratify = df["Survived"])
+
+     
+    
+    logistic_model = linear_model.LogisticRegression().fit(X = train_data, y = train_label)
+    logistic_prediction = logistic_model.predict(test_data)
 
 
 
-    # Calculating accuracy and confusion matrix
+   
 
-    accuracy = log_fit.score(X = test_data, y = test_label)
-    accuracy = round(accuracy, 4)
+    model_acc = round(logistic_model.score(X = test_data, y = test_label),4)
+    
 
-    conf_m = metrics.confusion_matrix(y_true = test_label, y_pred = log_pred)
+    confusion_matrix = metrics.confusion_matrix(y_true = test_label, y_pred = logistic_prediction)
 
-    TN, FN, TP, FP = conf_m[0][0], conf_m[1][0], conf_m[1][1], conf_m[0][1]
+    TN = confusion_matrix[0][0]
+    FN = confusion_matrix[1][0] 
+    TP = confusion_matrix[1][1] 
+    FP = confusion_matrix[0][1]
 
 
-    return accuracy, TN, FP, FN, TP
+    return model_acc, TN, FP, FN, TP
 
     # END SOLUTION
     # return accuracy, TN, FP, FN, TP
