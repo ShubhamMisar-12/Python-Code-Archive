@@ -35,9 +35,9 @@ def step2(df):
     """
     # BEGIN SOLUTION
     
-    return df.drop(columns =  ['PassengerId', 'Name', 'Ticket', 'Cabin'], inplace = True)
     
-    
+    df = df.drop(columns = ['PassengerId', 'Name', 'Ticket', 'Cabin'])
+    return df
     # END SOLUTION
     # return df
 
@@ -52,10 +52,9 @@ def step3(df):
     """
     # BEGIN SOLUTION
     
-    df = df.dropna()
-    return df.reset_index(drop = True)
+    df = df.dropna().reset_index(drop=True)
 
-    
+    return df
 
     # END SOLUTION
     # return df
@@ -70,8 +69,12 @@ def step4(df):
     """
     # BEGIN SOLUTION
 
-    return df.replace({'Sex':{'male': 1, 'female': 0}, 'Embarked':{'S': 2, 'C': 0, 'Q': 1}})
+    sex_enc = {'male': 1, 'female': 0}
+    embarked_enc = {'S': 2, 'C': 0, 'Q': 1}
+    df = df.replace({'Sex':sex_enc, 'Embarked':embarked_enc})
     
+
+    return df
     # END SOLUTION
     # return df
 
@@ -85,8 +88,8 @@ def step5(df):
     """
     # BEGIN SOLUTION
     
-    clms = ['Pclass', 'Sex', 'Embarked', 'Survived']
-    df[clms] = df[clms].apply(lambda c: c.astype('category'))
+    cat_cols = ['Pclass', 'Sex', 'Embarked', 'Survived']
+    df[cat_cols] = df[cat_cols].apply(lambda c: c.astype('category'))
 
     return df
     # END SOLUTION
@@ -117,28 +120,33 @@ def step6(df):
     from sklearn import metrics
     from sklearn import linear_model
 
+    # Intitial Split
 
-    features = df.drop("Survived", axis = 1)
-    pred = df["Survived"]
+    data = df.drop("Survived", axis = 1)
+    labels = df["Survived"]
 
+    # Train and Test
 
-    train_data, test_data, train_label, test_label = train_test_split(features, pred, test_size = 0.3, random_state = 1, stratify = df["Survived"])
+    train_data, test_data, train_label, test_label = train_test_split(data, labels, test_size = 0.25, random_state = 1, stratify = df["Survived"])
 
+    # Fitting the model 
     
     log_fit = linear_model.LogisticRegression().fit(X = train_data, y = train_label)
     log_pred = log_fit.predict(test_data)
 
 
 
+    # Calculating accuracy and confusion matrix
 
-    model_acc = log_fit.score(X = test_data, y = test_label)
-    model_acc = round(model_acc, 4)
+    accuracy = log_fit.score(X = test_data, y = test_label)
+    accuracy = round(accuracy, 4)
 
     conf_m = metrics.confusion_matrix(y_true = test_label, y_pred = log_pred)
 
     TN, FN, TP, FP = conf_m[0][0], conf_m[1][0], conf_m[1][1], conf_m[0][1]
 
 
-    return model_acc, TN, FP, FN, TP
+    return accuracy, TN, FP, FN, TP
 
     # END SOLUTION
+    # return accuracy, TN, FP, FN, TP

@@ -1,14 +1,50 @@
 {
     "tests": [
         {
-            "name": "test_assignment7 (unittest.loader._FailedTest)",
-            "score": 0.0,
-            "max_score": 0.0,
-            "output": "Test Failed: Failed to import test module: test_assignment7\nTraceback (most recent call last):\n  File \"C:\\Users\\Shubham\\AppData\\Local\\Programs\\Python\\Python37\\lib\\unittest\\loader.py\", line 434, in _find_test_path\n    module = self._get_module_from_name(name)\n  File \"C:\\Users\\Shubham\\AppData\\Local\\Programs\\Python\\Python37\\lib\\unittest\\loader.py\", line 375, in _get_module_from_name\n    __import__(name)\n  File \"c:\\Users\\Shubham\\Downloads\\Github-Repos\\Python- EAS503\\Assignment7\\tests\\test_assignment7.py\", line 3, in <module>\n    import assignment7\nModuleNotFoundError: No module named 'assignment7'\n\n"
+            "name": "test_step1 (test_assignment7.Testassignment7)",
+            "score": 6,
+            "max_score": 6,
+            "visibility": "visible",
+            "number": "step1"
+        },
+        {
+            "name": "test_step2 (test_assignment7.Testassignment7)",
+            "score": 6,
+            "max_score": 6,
+            "visibility": "visible",
+            "number": "step2"
+        },
+        {
+            "name": "test_step3 (test_assignment7.Testassignment7)",
+            "score": 6,
+            "max_score": 6,
+            "visibility": "visible",
+            "number": "step3"
+        },
+        {
+            "name": "test_step4 (test_assignment7.Testassignment7)",
+            "score": 6,
+            "max_score": 6,
+            "visibility": "visible",
+            "number": "step4"
+        },
+        {
+            "name": "test_step5 (test_assignment7.Testassignment7)",
+            "score": 6,
+            "max_score": 6,
+            "visibility": "visible",
+            "number": "step5"
+        },
+        {
+            "name": "test_step6 (test_assignment7.Testassignment7)",
+            "score": 6,
+            "max_score": 6,
+            "visibility": "visible",
+            "number": "step6"
         }
     ],
     "leaderboard": [],
     "visibility": "visible",
-    "execution_time": "0.00",
-    "score": 0.0
+    "execution_time": "1.85",
+    "score": 36
 }
