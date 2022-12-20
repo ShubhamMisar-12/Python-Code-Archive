@@ -1,0 +1,39 @@
+{
+    "tests": [
+        {
+            "name": "test_ex1 (test_assignment8.Testassignment8)",
+            "score": 10,
+            "max_score": 10,
+            "visibility": "visible",
+            "number": "ex1"
+        },
+        {
+            "name": "test_ex2 (test_assignment8.Testassignment8)",
+            "score": 0.0,
+            "max_score": 10,
+            "output": "Test Failed: [Errno 2] No such file or directory: 'ex2.tsv'\n",
+            "visibility": "visible",
+            "number": "ex2"
+        },
+        {
+            "name": "test_ex3 (test_assignment8.Testassignment8)",
+            "score": 0.0,
+            "max_score": 10,
+            "output": "Test Failed: [Errno 2] No such file or directory: 'ex3.tsv'\n",
+            "visibility": "visible",
+            "number": "ex3"
+        },
+        {
+            "name": "test_ex4 (test_assignment8.Testassignment8)",
+            "score": 0.0,
+            "max_score": 10,
+            "output": "Test Failed: [Errno 2] No such file or directory: 'ex4.tsv'\n",
+            "visibility": "visible",
+            "number": "ex4"
+        }
+    ],
+    "leaderboard": [],
+    "visibility": "visible",
+    "execution_time": "0.02",
+    "score": 10.0
+}
