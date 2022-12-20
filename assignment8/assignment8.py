@@ -32,15 +32,11 @@ def ex1():
         lines.append([month_names[month], month_dic[month]])
     import csv
     with open('ex1.tsv', 'w', newline='') as f:
-        #csv writer to write in tsv file
         tsv_writer = csv.writer(f, delimiter='\t')
-        #write header in tsv file
         tsv_writer.writerow(header)
-        #write rows
         tsv_writer.writerows(lines)
-        #close csv file
         f.close()
-        pass
+        
 
     # END SOLUTION
 
@@ -125,7 +121,64 @@ def ex3():
     **** SORT BY Patient ID and then LabDateTime in ascending order 
     """
     # BEGIN SOLUTION
-    pass
+    with open('PatientCorePopulatedTable.txt') as f:
+        data = f.read()
+    patient = {}
+    header_patient = None
+    for line in data.strip().split("\n"):
+        if not line.strip():
+            continue
+        if header_patient is None:
+            header_patient = line.split("\t")
+            continue
+        clns = line.split("\t")
+        patient[clns[0]] = clns[1:]
+    
+    with open('LabsCorePopulatedTable.txt') as f:
+        data = f.read()
+    
+    Labs = []
+    header_lab = None
+    for line in data.strip().split("\n"):
+        if not line.strip():
+            continue
+        if header_lab is None:
+            header_lab = line.split("\t")
+            continue
+        clns = line.split("\t")
+        if clns[2] == 'METABOLIC: CREATININE':
+            Labs.append(clns)
+
+    from datetime import datetime
+    res = []
+    for l in Labs:
+        if l[0] in patient.keys():
+            patient[l[0]]
+            if patient[l[0]][0] == 'Male':
+                if 0.7 <= float(l[3]) <= 1.3:
+                    res.append([l[0], patient[l[0]][0], l[2], l[3], l[4], l[5] , 'Normal'])
+                else:
+                    res.append([l[0], patient[l[0]][0], l[2], l[3], l[4], l[5], 'Out of Range'])
+            elif patient[l[0]][0] == 'Female':
+                if 0.6 <= float(l[3]) <= 1.1:
+                    res.append([l[0], patient[l[0]][0], l[2], l[3], l[4], l[5], 'Normal'])
+                else:
+                    res.append([l[0], patient[l[0]][0], l[2], l[3], l[4], l[5], 'Out of Range'])
+
+    res = sorted(res, key = lambda x: (x[0], datetime.strptime(x[5], '%Y-%m-%d %H:%M:%S.%f')) )     
+
+    header_res = ['PatientID','PatientGender', 'LabName','LabValue','LabUnits','LabDateTime', 'Interpretation']
+
+    import csv
+
+    with open('ex3.tsv', 'w', newline='') as f:
+        tsv_writer = csv.writer(f, delimiter='\t')
+        tsv_writer.writerow(header_res)
+        tsv_writer.writerows(res)
+        f.close()       
+                    
+
+   
     # END SOLUTION
 
 
@@ -150,6 +203,8 @@ def ex4():
     FROM 
         AGE
     GROUP BY AGE_RANGE
+
+    
     ORDER BY AGE
 
     ****** VERY IMPORTANT: Use the Date: 2022-12-11 as today's date!!!! VERY IMPORTANT otherwise your result will change everyday!
@@ -157,5 +212,52 @@ def ex4():
 
     """
     # BEGIN SOLUTION
-    pass
+    from datetime import datetime
+
+    with open('PatientCorePopulatedTable.txt') as f:
+        data = f.read()
+        
+    p_ages = {}
+    header_patient = None
+    for line in data.strip().split("\n"):
+        if not line.strip():
+            continue
+        if header_patient is None:
+            header_patient = line.split("\t")
+            continue
+            
+        clns = line.split("\t")
+        
+        str_d1 = '2022-12-11'
+        str_d2 = clns[2]
+
+        d1 = datetime.strptime(str_d1, "%Y-%m-%d")
+        d2 = datetime.strptime(str_d2.split(" ")[0], "%Y-%m-%d")
+        age = round((d1 - d2).days/365.25)
+        if age < 18:
+            per_age = "YOUTH"
+        elif 18 <= age <= 36:
+            per_age = "YOUNG ADULT"
+        elif 36 < age <= 55:
+            per_age = "ADULT"
+        elif age >= 56:
+            
+            per_age = "SENIOR"
+            
+        if per_age not in p_ages.keys():
+            p_ages[per_age] = 1
+        else:
+            p_ages[per_age] = p_ages[per_age] + 1
+            
+    
+
+    age_strf= list(map(lambda x: [x, p_ages[x]], sorted(p_ages, key = lambda x: p_ages[x] ) ))
+    header_strf = ['AGE_RANGE','AGE_RANGE_COUNT']
+
+    import csv
+    with open('ex4.tsv', 'w', newline='') as f:
+        tsv_writer = csv.writer(f, delimiter='\t')
+        tsv_writer.writerow(header_strf)
+        tsv_writer.writerows(age_strf)
+        f.close()
     # END SOLUTION
