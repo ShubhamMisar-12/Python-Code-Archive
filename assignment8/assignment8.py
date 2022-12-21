@@ -1,4 +1,6 @@
+import csv
 def ex1():
+    
     """
     Reproduce ex1.tsv from 'AdmissionsCorePopulatedTable.txt'
     https://mkzia.github.io/eas503-notes/sql/sql_6_conditionals.html#conditionals
@@ -30,12 +32,12 @@ def ex1():
     lines = []
     for month in month_sorted:
         lines.append([month_names[month], month_dic[month]])
-    import csv
+    lines = sorted(lines, key = lambda x: (-x[1],x[0])) 
     with open('ex1.tsv', 'w', newline='') as f:
         tsv_writer = csv.writer(f, delimiter='\t')
         tsv_writer.writerow(header)
         tsv_writer.writerows(lines)
-        f.close()
+        
         
 
     # END SOLUTION
@@ -80,7 +82,7 @@ def ex2():
         tsv_writer = csv.writer(f, delimiter='\t')
         tsv_writer.writerow(header)
         tsv_writer.writerows(lines)
-        f.close()
+        
         
 
     # END SOLUTION
@@ -172,7 +174,7 @@ def ex3():
         tsv_writer = csv.writer(f, delimiter='\t')
         tsv_writer.writerow(header_res)
         tsv_writer.writerows(res)
-        f.close()       
+              
                     
 
    
@@ -256,5 +258,5 @@ def ex4():
         tsv_writer = csv.writer(f, delimiter='\t')
         tsv_writer.writerow(header_strf)
         tsv_writer.writerows(age_strf)
-        f.close()
+        
     # END SOLUTION
